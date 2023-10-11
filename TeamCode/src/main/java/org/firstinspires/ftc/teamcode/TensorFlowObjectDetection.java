@@ -53,6 +53,7 @@ import java.util.List;
 public class TensorFlowObjectDetection extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+//    private static final String TFOD_MODEL_FILE ="file:///android_asset/quuen1.tflite" ;
 
     /**
      * The variable to store our instance of the TensorFlow Object Detection processor.
@@ -106,15 +107,15 @@ public class TensorFlowObjectDetection extends LinearOpMode {
     private void initTfod() {
 
         // Create the TensorFlow processor the easy way.
-        tfod = TfodProcessor.easyCreateWithDefaults();
-        /*
-        tfod = new TfodProcessor.Builder()
-                .setModelFileName(TFOD_MODEL_FILE)
-                .setModelLabels(LABELS)
+//        tfod = TfodProcessor.easyCreateWithDefaults();
+        String[] labels = {"Blue Prop"};
+        tfod = new TfodProcessor.Builder().setModelAssetName("quuen1.tflite")
+//                .setModelFileName(TFOD_MODEL_FILE)
+                .setModelLabels(labels)
                 //.setIsModelTensorFlow2(true)
                 .setIsModelQuantized(true)
                 .build();
-        */
+
 
         // Create the vision portal the easy way.
         if (USE_WEBCAM) {
