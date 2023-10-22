@@ -72,7 +72,7 @@ public class TestBed extends LinearOpMode {
 
         waitForStart();
 
-        double servoDelta = 0.001;
+        double servoDelta = 0.005;
 
         while (opModeIsActive()) {
             double armPower = gamepad1.left_stick_y;
