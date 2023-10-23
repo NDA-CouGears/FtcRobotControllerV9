@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Size;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -48,7 +50,7 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-@TeleOp(name = "Concept: TensorFlow Object Detection Easy", group = "Concept")
+@TeleOp(name = "Team Prop TF", group = "Concept")
 
 public class TensorFlowObjectDetection extends LinearOpMode {
 
@@ -58,7 +60,8 @@ public class TensorFlowObjectDetection extends LinearOpMode {
     /**
      * The variable to store our instance of the TensorFlow Object Detection processor.
      */
-    private TfodProcessor tfod;
+    private TfodProcessor tfodBlue;
+    private TfodProcessor tfodRed;
 
     /**
      * The variable to store our instance of the vision portal.
@@ -108,23 +111,30 @@ public class TensorFlowObjectDetection extends LinearOpMode {
 
         // Create the TensorFlow processor the easy way.
 //        tfod = TfodProcessor.easyCreateWithDefaults();
-        String[] labels = {"Blue Prop"};
-        tfod = new TfodProcessor.Builder().setModelAssetName("quuen1.tflite")
-//                .setModelFileName(TFOD_MODEL_FILE)
-                .setModelLabels(labels)
-                //.setIsModelTensorFlow2(true)
+        String[] labelsRed = {"Red Prop"};
+        tfodRed = new TfodProcessor.Builder()
+                .setModelAssetName("redup.tflite")
+                .setModelLabels(labelsRed)
                 .setIsModelQuantized(true)
                 .build();
 
+        String [] labelsBlue = {"Blue Prop"};
+        tfodBlue = new TfodProcessor.Builder()
+                .setModelAssetName("bluetraning.tflite")
+                .setModelLabels(labelsBlue)
+                .setIsModelQuantized(true)
+                .build();
 
         // Create the vision portal the easy way.
-        if (USE_WEBCAM) {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                hardwareMap.get(WebcamName.class, "Webcam1"), tfod);
-        } else {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                BuiltinCameraDirection.BACK, tfod);
-        }
+        // visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam1"), tfod);
+        visionPortal = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam1"))
+                .addProcessors(tfodBlue, tfodRed)
+                .setCameraResolution(new Size(640, 480))
+                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
+                .enableLiveView(true)
+                .setAutoStopLiveView(true)
+                .build();
 
     }   // end method initTfod()
 
@@ -133,11 +143,22 @@ public class TensorFlowObjectDetection extends LinearOpMode {
      */
     private void telemetryTfod() {
 
-        List<Recognition> currentRecognitions = tfod.getRecognitions();
-        telemetry.addData("# Objects Detected", currentRecognitions.size());
+        List<Recognition> currentRecognitionsBlue = tfodBlue.getRecognitions();
+        List<Recognition> currentRecognitionsRed = tfodRed.getRecognitions();
+        telemetry.addData("# Objects Detected", currentRecognitionsRed.size()+currentRecognitionsBlue.size());
 
         // Step through the list of recognitions and display info for each one.
-        for (Recognition recognition : currentRecognitions) {
+        for (Recognition recognition : currentRecognitionsRed) {
+            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
+            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+
+            telemetry.addData(""," ");
+            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+            telemetry.addData("- Position", "%.0f / %.0f", x, y);
+            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
+        }   // end for() loop
+        // Step through the list of recognitions and display info for each one.
+        for (Recognition recognition : currentRecognitionsBlue) {
             double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
             double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
 
