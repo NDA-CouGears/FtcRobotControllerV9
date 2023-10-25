@@ -50,9 +50,7 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-@TeleOp(name = "Team Prop TF", group = "Concept")
-
-public class TensorFlowObjectDetection extends LinearOpMode {
+public abstract class TensorFlowObjectDetection extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 //    private static final String TFOD_MODEL_FILE ="file:///android_asset/quuen1.tflite" ;
@@ -103,6 +101,8 @@ public class TensorFlowObjectDetection extends LinearOpMode {
 
     }   // end runOpMode()
 
+    abstract protected TfodProcessor getProcessor();
+
     /**
      * Initialize the TensorFlow Object Detection processor.
      */
@@ -111,12 +111,8 @@ public class TensorFlowObjectDetection extends LinearOpMode {
         // Create the TensorFlow processor the easy way.
 //        tfod = TfodProcessor.easyCreateWithDefaults();
 //        String[] labels = {"Red Prop"};
-        String[] labels = {"Blue Prop"};
-        tfod = new TfodProcessor.Builder()
-                .setModelAssetName("bluetraning.tflite")
-                .setModelLabels(labels)
-                .setIsModelQuantized(true)
-                .build();
+
+        tfod = getProcessor();
 
         // Create the vision portal the easy way.
         // visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam1"), tfod);
