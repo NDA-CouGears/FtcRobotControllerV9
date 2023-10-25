@@ -60,8 +60,7 @@ public class TensorFlowObjectDetection extends LinearOpMode {
     /**
      * The variable to store our instance of the TensorFlow Object Detection processor.
      */
-    private TfodProcessor tfodBlue;
-    private TfodProcessor tfodRed;
+    private TfodProcessor tfod;
 
     /**
      * The variable to store our instance of the vision portal.
@@ -111,17 +110,11 @@ public class TensorFlowObjectDetection extends LinearOpMode {
 
         // Create the TensorFlow processor the easy way.
 //        tfod = TfodProcessor.easyCreateWithDefaults();
-        String[] labelsRed = {"Red Prop"};
-        tfodRed = new TfodProcessor.Builder()
-                .setModelAssetName("redup.tflite")
-                .setModelLabels(labelsRed)
-                .setIsModelQuantized(true)
-                .build();
-
-        String [] labelsBlue = {"Blue Prop"};
-        tfodBlue = new TfodProcessor.Builder()
+//        String[] labels = {"Red Prop"};
+        String[] labels = {"Blue Prop"};
+        tfod = new TfodProcessor.Builder()
                 .setModelAssetName("bluetraning.tflite")
-                .setModelLabels(labelsBlue)
+                .setModelLabels(labels)
                 .setIsModelQuantized(true)
                 .build();
 
@@ -129,7 +122,7 @@ public class TensorFlowObjectDetection extends LinearOpMode {
         // visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam1"), tfod);
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam1"))
-                .addProcessors(tfodBlue, tfodRed)
+                .addProcessor(tfod)
                 .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
                 .enableLiveView(true)
@@ -143,22 +136,11 @@ public class TensorFlowObjectDetection extends LinearOpMode {
      */
     private void telemetryTfod() {
 
-        List<Recognition> currentRecognitionsBlue = tfodBlue.getRecognitions();
-        List<Recognition> currentRecognitionsRed = tfodRed.getRecognitions();
-        telemetry.addData("# Objects Detected", currentRecognitionsRed.size()+currentRecognitionsBlue.size());
+        List<Recognition> currentRecognitions = tfod.getRecognitions();
+        telemetry.addData("# Objects Detected", currentRecognitions.size());
 
         // Step through the list of recognitions and display info for each one.
-        for (Recognition recognition : currentRecognitionsRed) {
-            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
-            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
-
-            telemetry.addData(""," ");
-            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-            telemetry.addData("- Position", "%.0f / %.0f", x, y);
-            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
-        }   // end for() loop
-        // Step through the list of recognitions and display info for each one.
-        for (Recognition recognition : currentRecognitionsBlue) {
+        for (Recognition recognition : currentRecognitions) {
             double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
             double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
 
