@@ -75,8 +75,6 @@ public class TestBed extends LinearOpMode {
         double servoDelta = 0.005;
 
         while (opModeIsActive()) {
-            double armPower = gamepad1.left_stick_y;
-
             double wristPos = wristServo.getPosition();
             if (gamepad1.dpad_down) {
                 wristPos -= servoDelta;
@@ -93,6 +91,8 @@ public class TestBed extends LinearOpMode {
             double rightServoPos = rightServo.getPosition();
             rightServoPos = rightServoPos + (gamepad1.right_stick_x*servoDelta);
             rightServo.setPosition(rightServoPos);
+
+            double armPower = gamepad1.left_stick_y;
 
             armPower   = Range.clip(armPower, -1.0, 1.0) ;
 
