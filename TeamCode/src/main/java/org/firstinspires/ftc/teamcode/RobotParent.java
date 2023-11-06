@@ -1,0 +1,270 @@
+/*
+    author: delia jasper
+    purpose: another way to drive using mecanum wheels
+ */
+
+// i want to try this out soon and see if a it works and if b if the drivers like robot or field centric better
+
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+@TeleOp(name="Drive and Lift2", group="TeleOp")
+abstract public class RobotParent extends LinearOpMode {
+
+    // initialize narrators
+    private DcMotor leftFrontDrive = null;
+    private DcMotor leftBackDrive = null;
+    private DcMotor rightFrontDrive = null;
+    private DcMotor rightBackDrive = null;
+    private DcMotor winchMotor = null;
+    private DcMotor armMotor = null;
+    private Servo clawLeftServo;
+    private Servo clawRightServo;
+    private Servo wristServo;
+
+
+    // final variables
+    static final double DRIVE_SPEED = 0.6;
+    static final double TURN_SPEED = 0.5;
+    static final double DRIVE_GEAR_REDUCTION = 1.0 ;
+    static final double WHEEL_DIAMETER_MM = 97;
+    static final double COUNTS_PER_MOTOR_REV = 1440;
+    static final double COUNTS_PER_MM = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * 3.1415);
+    private ElapsedTime runtime = new ElapsedTime();
+
+//    // final variables
+//    static final double DRIVE_GEAR_REDUCTION = 1.0;
+//    static final double WHEEL_DIAMETER_MM = 37.0;
+//    static final double COUNTS_PER_MOTOR_REV = 1440;
+//    static final double middleServo = 58;
+//    static final double middleServo2= 77;
+//    static final double topServo = 67;
+//    static final double topServo2 = 96;
+//    static final double servoMax = 69;
+//    static final double servo2Max = 96;
+
+    static final double clawLeftServoMin = 0;
+    static final double clawRightServoMin = 0;
+    static final double clawLeftServoMax = 0;
+    static final double clawRightServoMax = 0;
+    static final double wristServoMin = 0;
+    static final double wristServoMax = 0;
+
+
+    @Override
+    public void runOpMode() {
+
+        initHardware();
+
+        // Wait for the DS start button to be touched.
+        telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
+        telemetry.addData(">", "Touch Play to start OpMode");
+        telemetry.update();
+        waitForStart();
+
+        if (opModeIsActive()) {
+            while (opModeIsActive()) {
+
+//                telemetryTfod();
+
+                // Push telemetry to the Driver Station.
+                telemetry.update();
+
+                // Save CPU resources; can resume streaming when needed.
+//                if (gamepad1.dpad_down) {
+//                    visionPortal.stopStreaming();
+//                } else if (gamepad1.dpad_up) {
+//                    visionPortal.resumeStreaming();
+//                }
+
+                // Share the CPU.
+                sleep(20);
+            }
+        }
+
+        // Save more CPU resources when camera is no longer needed.
+//        visionPortal.close();
+
+    }   // end runOpMode()
+
+    private void encoderDrive(double speed,
+                             double leftFrontInches, double rightFrontInches, double leftBackInches, double rightBackInches,
+                             double timeoutS) {
+        int newLeftFrontTarget;
+        int newLeftBackTarget;
+        int newRightFrontTarget;
+        int newRightBackTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newLeftFrontTarget = leftFrontDrive.getCurrentPosition() + (int) (25.4 * leftFrontInches * COUNTS_PER_MM);
+            newLeftBackTarget = leftBackDrive.getCurrentPosition() + (int) (25.4 * leftBackInches * COUNTS_PER_MM);
+            newRightFrontTarget = rightFrontDrive.getCurrentPosition() + (int) (25.4 * rightFrontInches * COUNTS_PER_MM);
+            newRightBackTarget = rightBackDrive.getCurrentPosition() + (int) (25.4 * rightBackInches * COUNTS_PER_MM);
+            leftFrontDrive.setTargetPosition(newLeftFrontTarget);
+            leftBackDrive.setTargetPosition(newLeftBackTarget);
+            rightFrontDrive.setTargetPosition(newRightFrontTarget);
+            rightBackDrive.setTargetPosition(newRightBackTarget);
+
+            // Turn On RUN_TO_POSITION
+            leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+            telemetry.addData("Currently at", " at %7d :%7d",
+                    leftFrontDrive.getCurrentPosition(), leftBackDrive.getCurrentPosition(),
+                    rightFrontDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition());
+            telemetry.update();
+            sleep(500);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            leftFrontDrive.setPower(Math.abs(speed));
+            leftBackDrive.setPower(Math.abs(speed));
+            rightFrontDrive.setPower(Math.abs(speed));
+            rightBackDrive.setPower(Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (leftFrontDrive.isBusy() && leftBackDrive.isBusy() && rightFrontDrive.isBusy() && rightBackDrive.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Running to", " %7d :%7d", newLeftFrontTarget, newLeftBackTarget, newRightFrontTarget, newRightBackTarget);
+                telemetry.addData("Currently at", " at %7d :%7d",
+                        leftFrontDrive.getCurrentPosition(), leftBackDrive.getCurrentPosition(),
+                        rightFrontDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            leftFrontDrive.setPower(0);
+            leftBackDrive.setPower(0);
+            rightFrontDrive.setPower(0);
+            rightBackDrive.setPower(0);
+
+            telemetry.addData("Running to", " %7d :%7d", newLeftFrontTarget, newLeftBackTarget, newRightFrontTarget, newRightBackTarget);
+            telemetry.update();
+            sleep(500);
+
+
+            // Turn off RUN_TO_POSITION
+            leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            sleep(250);   // optional pause after each move.
+        }}
+
+        private void mecanumDrive() {
+            double y = -gamepad1.left_stick_y; // Remember, this is reversed!
+            double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
+            double rx = gamepad1.right_stick_x;
+
+            // Denominator is the largest motor power (absolute value) or 1
+            // This ensures all the powers maintain the same ratio, but only when
+            // at least one is out of the range [-1, 1]
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+            double frontLeftPower = (y + x + rx) / denominator;
+            double backLeftPower = (y - x + rx) / denominator;
+            double frontRightPower = (y - x - rx) / denominator;
+            double backRightPower = (y + x - rx) / denominator;
+
+            leftFrontDrive.setPower(frontLeftPower);
+            leftBackDrive.setPower(backLeftPower);
+            rightFrontDrive.setPower(frontRightPower);
+            rightBackDrive.setPower(backRightPower);
+        }
+
+        public void initHardware() {
+
+            // Initialize the drive system variables.
+            leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
+            leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
+            rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
+            rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+            armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
+            winchMotor = hardwareMap.get(DcMotor.class, "winch_motor");
+            clawLeftServo = hardwareMap.servo.get("servo1");
+            clawRightServo = hardwareMap.servo.get("servo2");
+            wristServo = hardwareMap.servo.get("servo3");
+
+            // setting direction for motors
+            leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+            leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+            rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+            rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+            armMotor.setDirection(DcMotor.Direction.FORWARD);
+            winchMotor.setDirection(DcMotor.Direction.FORWARD);
+
+            //Setting Encorders for motors
+            leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            winchMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            winchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        }
+
+
+        public void arm(){
+            boolean leftBumper1 = gamepad1.left_bumper;
+            boolean rightBumper1 = gamepad1.right_bumper;
+            boolean leftBumper2 = gamepad2.left_bumper;
+            boolean rightBumper2 = gamepad2.right_bumper;
+
+            waitForStart();
+
+            while (opModeIsActive()) {
+//                double y = gamepad1.left_stick_y;
+//                double x = gamepad1.left_stick_x * -1.1; // Counteract imperfect strafing
+//                double rx = gamepad1.right_stick_x;
+                double deltaY = -gamepad2.left_stick_y;
+//                double deltaY2 = -gamepad2.right_stick_y;
+
+                if (leftBumper1)
+                {
+                    clawLeftServo.setPosition(clawLeftServoMin);
+                }
+
+                if (rightBumper1)
+                {
+                    clawLeftServo.setPosition(clawLeftServoMax);
+                }
+
+                if (leftBumper2)
+                {
+                    clawRightServo.setPosition(clawRightServoMin);
+                }
+
+                if (rightBumper2)
+                {
+                    clawRightServo.setPosition(clawRightServoMax);
+                }
+
+            }
+        }
+}
