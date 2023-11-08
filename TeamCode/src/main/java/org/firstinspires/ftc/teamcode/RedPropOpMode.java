@@ -9,7 +9,7 @@ public class RedPropOpMode extends TensorFlowObjectDetection {
     protected TfodProcessor getProcessor(){
         String[] labels = {"Red Prop"};
         TfodProcessor newProcessor = new TfodProcessor.Builder()
-                .setModelAssetName("redtraning.tflite")
+                .setModelAssetName("redtrainingfinal.tflite")
                 .setModelLabels(labels)
                 .setIsModelQuantized(true)
                 .build();
@@ -17,3 +17,4 @@ public class RedPropOpMode extends TensorFlowObjectDetection {
     }
 
 }
+
