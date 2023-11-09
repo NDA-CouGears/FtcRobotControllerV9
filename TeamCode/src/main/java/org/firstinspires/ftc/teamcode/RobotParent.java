@@ -11,9 +11,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="Drive and Lift2", group="TeleOp")
+
 abstract public class RobotParent extends LinearOpMode {
 
     // initialize narrators
@@ -26,6 +28,7 @@ abstract public class RobotParent extends LinearOpMode {
     private Servo clawLeftServo;
     private Servo clawRightServo;
     private Servo wristServo;
+    private TouchSensor touchSensor;
 
 
     // final variables
@@ -54,45 +57,11 @@ abstract public class RobotParent extends LinearOpMode {
     static final double clawRightServoMax = 0;
     static final double wristServoMin = 0;
     static final double wristServoMax = 0;
+    static final double armPosMin = 0;
+    static final double armPosMax = 0;
 
 
-    @Override
-    public void runOpMode() {
-
-        initHardware();
-
-        // Wait for the DS start button to be touched.
-        telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
-        telemetry.addData(">", "Touch Play to start OpMode");
-        telemetry.update();
-        waitForStart();
-
-        if (opModeIsActive()) {
-            while (opModeIsActive()) {
-
-//                telemetryTfod();
-
-                // Push telemetry to the Driver Station.
-                telemetry.update();
-
-                // Save CPU resources; can resume streaming when needed.
-//                if (gamepad1.dpad_down) {
-//                    visionPortal.stopStreaming();
-//                } else if (gamepad1.dpad_up) {
-//                    visionPortal.resumeStreaming();
-//                }
-
-                // Share the CPU.
-                sleep(20);
-            }
-        }
-
-        // Save more CPU resources when camera is no longer needed.
-//        visionPortal.close();
-
-    }   // end runOpMode()
-
-    private void encoderDrive(double speed,
+    protected void encoderDrive(double speed,
                              double leftFrontInches, double rightFrontInches, double leftBackInches, double rightBackInches,
                              double timeoutS) {
         int newLeftFrontTarget;
@@ -171,7 +140,7 @@ abstract public class RobotParent extends LinearOpMode {
             sleep(250);   // optional pause after each move.
         }}
 
-        private void mecanumDrive() {
+        protected void mecanumDrive() {
             double y = -gamepad1.left_stick_y; // Remember, this is reversed!
             double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
             double rx = gamepad1.right_stick_x;
@@ -191,7 +160,7 @@ abstract public class RobotParent extends LinearOpMode {
             rightBackDrive.setPower(backRightPower);
         }
 
-        public void initHardware() {
+        protected void initHardware() {
 
             // Initialize the drive system variables.
             leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
@@ -230,20 +199,33 @@ abstract public class RobotParent extends LinearOpMode {
         }
 
 
-        public void arm(){
+        protected void ArmAndWrist(){
+
+            double armPower = gamepad2.left_stick_y;
+            armPower   = Range.clip(armPower, -1.0, 1.0) ;
+            armMotor.setPower(armPower);
+
+           double wristAdjust = 0.02;
+           double wristPos = armMotor.getCurrentPosition()* wristAdjust;
+           wristServo.setPosition(wristPos);
+
+           if(armMotor.getCurrentPosition() >= armPosMax){
+               armMotor.setPower(0);
+           }
+            if(armMotor.getCurrentPosition() >= armPosMax){
+                armMotor.setPower(0);
+            }
+            telemetry.addData("Motors", "arm Power(%.2f)", armPower);
+            telemetry.addData("Motors", "arm Position(%.2f)", armPower);
+            telemetry.addData("Servos", "wrist (%.2f)", wristPos);
+
+        }
+
+        protected void claw(){
             boolean leftBumper1 = gamepad1.left_bumper;
             boolean rightBumper1 = gamepad1.right_bumper;
             boolean leftBumper2 = gamepad2.left_bumper;
             boolean rightBumper2 = gamepad2.right_bumper;
-
-            waitForStart();
-
-            while (opModeIsActive()) {
-//                double y = gamepad1.left_stick_y;
-//                double x = gamepad1.left_stick_x * -1.1; // Counteract imperfect strafing
-//                double rx = gamepad1.right_stick_x;
-                double deltaY = -gamepad2.left_stick_y;
-//                double deltaY2 = -gamepad2.right_stick_y;
 
                 if (leftBumper1)
                 {
@@ -267,4 +249,4 @@ abstract public class RobotParent extends LinearOpMode {
 
             }
         }
-}
+

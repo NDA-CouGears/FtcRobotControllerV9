@@ -50,7 +50,7 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-public abstract class TensorFlowObjectDetection extends LinearOpMode {
+public abstract class TensorFlowObjectDetection extends RobotParent {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 //    private static final String TFOD_MODEL_FILE ="file:///android_asset/quuen1.tflite" ;
