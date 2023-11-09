@@ -9,7 +9,7 @@ public class BluePropOpMode extends TensorFlowObjectDetection {
     protected TfodProcessor getProcessor(){
         String[] labels = {"Blue Prop"};
         TfodProcessor newProcessor = new TfodProcessor.Builder()
-                .setModelAssetName("bluetraning.tflite")
+                .setModelAssetName("bluetrainingfinal.tflite")
                 .setModelLabels(labels)
                 .setIsModelQuantized(true)
                 .build();
