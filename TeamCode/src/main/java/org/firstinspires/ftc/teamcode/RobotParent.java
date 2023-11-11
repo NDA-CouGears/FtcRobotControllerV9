@@ -8,7 +8,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -62,7 +61,10 @@ abstract public class RobotParent extends LinearOpMode {
 
 
     protected void encoderDrive(double speed,
-                                double leftFrontInches, double rightFrontInches, double leftBackInches, double rightBackInches,
+                                double leftFrontInches,
+                                double rightFrontInches,
+                                double leftBackInches,
+                                double rightBackInches,
                                 double timeoutS) {
         int newLeftFrontTarget;
         int newLeftBackTarget;
@@ -199,6 +201,11 @@ abstract public class RobotParent extends LinearOpMode {
 
     }
 
+    protected void winch() {
+        double winchPower = gamepad2.right_stick_y;
+        winchPower = Range.clip(winchPower, -1.0, 1.0);
+        winchMotor.setPower(winchPower);
+    }
 
     protected void ArmAndWrist() {
 
@@ -243,7 +250,20 @@ abstract public class RobotParent extends LinearOpMode {
         if (rightBumper2) {
             clawRightServo.setPosition(clawRightServoMax);
         }
+    }
 
+    protected void getHardwareTelemetry() {
+        double armPosit = armMotor.getCurrentPosition();
+        double winchPosit = winchMotor.getCurrentPosition();
+        double leftClawPosit = clawLeftServo.getPosition();
+        double rightClawPosit = clawRightServo.getPosition();
+        double wristPosit = wristServo.getPosition();
+
+        telemetry.addData("ArmPos: ", armPosit);
+        telemetry.addData("WinchPos: ", winchPosit);
+        telemetry.addData("LClawPos: ", leftClawPosit);
+        telemetry.addData("RClawPos: ", rightClawPosit);
+        telemetry.addData("WristPos: ", wristPosit);
     }
 }
 
