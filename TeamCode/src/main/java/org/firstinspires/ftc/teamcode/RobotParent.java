@@ -176,6 +176,8 @@ abstract public class RobotParent extends LinearOpMode {
         clawRightServo = hardwareMap.servo.get("servo2"); // port 0 control hub
         wristServo = hardwareMap.servo.get("servo3"); // port 2 control hub
 
+        winchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        
         // setting direction for motors
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
