@@ -254,12 +254,36 @@ abstract public class RobotParent extends LinearOpMode {
         }
     }
 
-    protected void getHardwareTelemetry() {
-        double armPosit = armMotor.getCurrentPosition();
-        double winchPosit = winchMotor.getCurrentPosition();
-        double leftClawPosit = clawLeftServo.getPosition();
-        double rightClawPosit = clawRightServo.getPosition();
-        double wristPosit = wristServo.getPosition();
+    protected void calibrationAndTelemetry() {
+
+        double servoDelta = 0.005;
+
+        double armPosit = armMotor.getCurrentPosition(); //gamepad1.left_stick_y
+        double armPow = gamepad1.left_stick_y;
+        armPow = Range.clip(armPow, -1.0, 1.0);
+        armMotor.setPower(armPow);
+
+        double winchPosit = winchMotor.getCurrentPosition(); //gamepad2.right_stick_y
+        double winchPow = gamepad2.right_stick_y;
+        winchPow = Range.clip(winchPow, -1.0, 1.0);
+        armMotor.setPower(winchPow);
+
+        double leftClawPosit = clawLeftServo.getPosition(); //gamepad1.left_stick_x
+        leftClawPosit = leftClawPosit + (gamepad1.left_stick_x*servoDelta);
+        clawLeftServo.setPosition(leftClawPosit);
+
+        double rightClawPosit = clawRightServo.getPosition(); //gamepad1.right_stick_x
+        rightClawPosit = rightClawPosit + (gamepad1.right_stick_x*servoDelta);
+        clawRightServo.setPosition(rightClawPosit);
+
+        double wristPosit = wristServo.getPosition(); //gamepad1.dpad_down
+        if(gamepad1.dpad_down){
+            wristPosit -= servoDelta;
+        }
+        else if(gamepad1.dpad_up){
+            wristPosit += servoDelta;
+        }
+        wristServo.setPosition(wristPosit);
 
         telemetry.addData("ArmPos: ", armPosit);
         telemetry.addData("WinchPos: ", winchPosit);

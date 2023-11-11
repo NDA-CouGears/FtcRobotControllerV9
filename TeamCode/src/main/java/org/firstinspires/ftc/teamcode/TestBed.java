@@ -94,7 +94,7 @@ public class TestBed extends LinearOpMode {
 
             double armPower = gamepad1.left_stick_y;
 
-            armPower   = Range.clip(armPower, -1.0, 1.0) ;
+            armPower = Range.clip(armPower, -1.0, 1.0) ;
 
             arm.setPower(armPower);
 

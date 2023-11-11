@@ -63,7 +63,7 @@ public class CalibrationOpMode_Linear extends RobotParent {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            getHardwareTelemetry();
+            calibrationAndTelemetry();
             telemetry.update();
         }
     }
