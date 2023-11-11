@@ -266,7 +266,7 @@ abstract public class RobotParent extends LinearOpMode {
         double winchPosit = winchMotor.getCurrentPosition(); //gamepad2.right_stick_y
         double winchPow = gamepad2.right_stick_y;
         winchPow = Range.clip(winchPow, -1.0, 1.0);
-        armMotor.setPower(winchPow);
+        winchMotor.setPower(winchPow);
 
         double leftClawPosit = clawLeftServo.getPosition(); //gamepad1.left_stick_x
         leftClawPosit = leftClawPosit + (gamepad1.left_stick_x*servoDelta);
