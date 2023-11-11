@@ -34,7 +34,7 @@ abstract public class RobotParent extends LinearOpMode {
     // final variables
     static final double DRIVE_SPEED = 0.6;
     static final double TURN_SPEED = 0.5;
-    static final double DRIVE_GEAR_REDUCTION = 1.0 ;
+    static final double DRIVE_GEAR_REDUCTION = 1.0;
     static final double WHEEL_DIAMETER_MM = 97;
     static final double COUNTS_PER_MOTOR_REV = 1440;
     static final double COUNTS_PER_MM = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * 3.1415);
@@ -62,8 +62,8 @@ abstract public class RobotParent extends LinearOpMode {
 
 
     protected void encoderDrive(double speed,
-                             double leftFrontInches, double rightFrontInches, double leftBackInches, double rightBackInches,
-                             double timeoutS) {
+                                double leftFrontInches, double rightFrontInches, double leftBackInches, double rightBackInches,
+                                double timeoutS) {
         int newLeftFrontTarget;
         int newLeftBackTarget;
         int newRightFrontTarget;
@@ -138,115 +138,112 @@ abstract public class RobotParent extends LinearOpMode {
             rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             sleep(250);   // optional pause after each move.
-        }}
+        }
+    }
 
-        protected void mecanumDrive() {
-            double y = -gamepad1.left_stick_y; // Remember, this is reversed!
-            double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
-            double rx = gamepad1.right_stick_x;
+    protected void mecanumDrive() {
+        double y = gamepad1.left_stick_y; // Remember, this is reversed!
+        double x = gamepad1.left_stick_x * -1.1; // Counteract imperfect strafing
+        double rx = gamepad1.right_stick_x;
 
-            // Denominator is the largest motor power (absolute value) or 1
-            // This ensures all the powers maintain the same ratio, but only when
-            // at least one is out of the range [-1, 1]
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-            double frontLeftPower = (y + x + rx) / denominator;
-            double backLeftPower = (y - x + rx) / denominator;
-            double frontRightPower = (y - x - rx) / denominator;
-            double backRightPower = (y + x - rx) / denominator;
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio, but only when
+        // at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double frontLeftPower = (y + x + rx) / denominator;
+        double backLeftPower = (y - x + rx) / denominator;
+        double frontRightPower = (y - x - rx) / denominator;
+        double backRightPower = (y + x - rx) / denominator;
 
-            leftFrontDrive.setPower(frontLeftPower);
-            leftBackDrive.setPower(backLeftPower);
-            rightFrontDrive.setPower(frontRightPower);
-            rightBackDrive.setPower(backRightPower);
+        leftFrontDrive.setPower(frontLeftPower);
+        leftBackDrive.setPower(backLeftPower);
+        rightFrontDrive.setPower(frontRightPower);
+        rightBackDrive.setPower(backRightPower);
+    }
+
+    protected void initHardware() {
+
+        // Initialize the drive system variables.
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive"); //port 0 on control hub
+        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive"); //port 1 on control hub
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive"); //port 0 on expansion hub
+        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive"); //port 1 on expansion hub
+        armMotor = hardwareMap.get(DcMotor.class, "arm_motor"); // port 2 on expansion hub
+        winchMotor = hardwareMap.get(DcMotor.class, "winch_motor"); // port 3 on expansion hub
+        clawLeftServo = hardwareMap.servo.get("servo1"); // port 1 on control hub
+        clawRightServo = hardwareMap.servo.get("servo2"); // port 0 control hub
+        wristServo = hardwareMap.servo.get("servo3"); // port 2 control hub
+
+        // setting direction for motors
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        armMotor.setDirection(DcMotor.Direction.FORWARD);
+        winchMotor.setDirection(DcMotor.Direction.FORWARD);
+
+        //Setting Encorders for motors
+        leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        winchMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        winchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+    }
+
+
+    protected void ArmAndWrist() {
+
+        double armPower = gamepad2.left_stick_y;
+        armPower = Range.clip(armPower, -1.0, 1.0);
+        armMotor.setPower(armPower);
+
+        double wristAdjust = 0.02;
+        double wristPos = armMotor.getCurrentPosition() * wristAdjust;
+        wristServo.setPosition(wristPos);
+
+        if (armMotor.getCurrentPosition() >= armPosMax) {
+            armMotor.setPower(0);
+        }
+        if (armMotor.getCurrentPosition() >= armPosMax) {
+            armMotor.setPower(0);
+        }
+        telemetry.addData("Motors", "arm Power(%.2f)", armPower);
+        telemetry.addData("Motors", "arm Position(%.2f)", armPower);
+        telemetry.addData("Servos", "wrist (%.2f)", wristPos);
+
+    }
+
+    protected void claw() {
+        boolean leftBumper1 = gamepad1.left_bumper;
+        boolean rightBumper1 = gamepad1.right_bumper;
+        boolean leftBumper2 = gamepad2.left_bumper;
+        boolean rightBumper2 = gamepad2.right_bumper;
+
+        if (leftBumper1) {
+            clawLeftServo.setPosition(clawLeftServoMin);
         }
 
-        protected void initHardware() {
-
-            // Initialize the drive system variables.
-            leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
-            leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
-            rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-            rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-            armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
-            winchMotor = hardwareMap.get(DcMotor.class, "winch_motor");
-            clawLeftServo = hardwareMap.servo.get("servo1");
-            clawRightServo = hardwareMap.servo.get("servo2");
-            wristServo = hardwareMap.servo.get("servo3");
-
-            // setting direction for motors
-            leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-            leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-            rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-            rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-            armMotor.setDirection(DcMotor.Direction.FORWARD);
-            winchMotor.setDirection(DcMotor.Direction.FORWARD);
-
-            //Setting Encorders for motors
-            leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            winchMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-            leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            winchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+        if (rightBumper1) {
+            clawLeftServo.setPosition(clawLeftServoMax);
         }
 
-
-        protected void ArmAndWrist(){
-
-            double armPower = gamepad2.left_stick_y;
-            armPower   = Range.clip(armPower, -1.0, 1.0) ;
-            armMotor.setPower(armPower);
-
-           double wristAdjust = 0.02;
-           double wristPos = armMotor.getCurrentPosition()* wristAdjust;
-           wristServo.setPosition(wristPos);
-
-           if(armMotor.getCurrentPosition() >= armPosMax){
-               armMotor.setPower(0);
-           }
-            if(armMotor.getCurrentPosition() >= armPosMax){
-                armMotor.setPower(0);
-            }
-            telemetry.addData("Motors", "arm Power(%.2f)", armPower);
-            telemetry.addData("Motors", "arm Position(%.2f)", armPower);
-            telemetry.addData("Servos", "wrist (%.2f)", wristPos);
-
+        if (leftBumper2) {
+            clawRightServo.setPosition(clawRightServoMin);
         }
 
-        protected void claw(){
-            boolean leftBumper1 = gamepad1.left_bumper;
-            boolean rightBumper1 = gamepad1.right_bumper;
-            boolean leftBumper2 = gamepad2.left_bumper;
-            boolean rightBumper2 = gamepad2.right_bumper;
-
-                if (leftBumper1)
-                {
-                    clawLeftServo.setPosition(clawLeftServoMin);
-                }
-
-                if (rightBumper1)
-                {
-                    clawLeftServo.setPosition(clawLeftServoMax);
-                }
-
-                if (leftBumper2)
-                {
-                    clawRightServo.setPosition(clawRightServoMin);
-                }
-
-                if (rightBumper2)
-                {
-                    clawRightServo.setPosition(clawRightServoMax);
-                }
-
-            }
+        if (rightBumper2) {
+            clawRightServo.setPosition(clawRightServoMax);
         }
+
+    }
+}
 
