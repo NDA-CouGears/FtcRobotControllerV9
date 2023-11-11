@@ -29,11 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 
 /*
@@ -49,33 +45,28 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOpMode", group="Team OpMode")
-public class TeleOpMode extends RobotParent {
-
+@TeleOp(name ="CalibrationOpMode", group="Team OpMode")
+public class CalibrationOpMode_Linear extends RobotParent {
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
+        // Initialize the hardware variables.
         initHardware();
-
-        // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
-        // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
-        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
 
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            mecanumDrive();
-            ArmAndWrist();
-            claw();
+
+
+
+
             telemetry.update();
         }
     }
