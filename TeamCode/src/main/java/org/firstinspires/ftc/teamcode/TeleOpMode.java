@@ -76,6 +76,7 @@ public class TeleOpMode extends RobotParent {
             mecanumDrive();
             ArmAndWrist();
             claw();
+            winch();
             telemetry.update();
         }
     }
