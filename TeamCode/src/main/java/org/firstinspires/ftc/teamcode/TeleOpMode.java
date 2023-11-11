@@ -49,7 +49,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TeleOpMode", group="Team OpMode")
+@TeleOp(name="TeleOpMode", group="Team OpModes")
 public class TeleOpMode extends RobotParent {
 
 

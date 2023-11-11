@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
-@TeleOp(name = "Blue Team Prop", group = "Concept")
+@Autonomous(name = "Blue Team Prop", group = "Team OpModes")
 public class BluePropOpMode extends TensorFlowObjectDetection {
     protected TfodProcessor getProcessor(){
         String[] labels = {"Blue Prop"};
