@@ -31,11 +31,6 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Size;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -50,7 +45,7 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-public abstract class TensorFlowObjectDetection extends RobotParent {
+public abstract class AutoMode extends RobotParent {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 //    private static final String TFOD_MODEL_FILE ="file:///android_asset/quuen1.tflite" ;
@@ -125,6 +120,21 @@ public abstract class TensorFlowObjectDetection extends RobotParent {
                 .setAutoStopLiveView(true)
                 .build();
 
+        int location = locateProp();
+
+        if (location == 1){
+//            encoderDrive();
+            openLeftClaw();
+        }
+        if (location == 2){
+//            encoderDrive();
+            openLeftClaw();
+        }
+        if (location == 3){
+//            encoderDrive();
+            openLeftClaw();
+        }
+
     }   // end method initTfod()
 
     /**
@@ -147,5 +157,35 @@ public abstract class TensorFlowObjectDetection extends RobotParent {
         }   // end for() loop
 
     }   // end method telemetryTfod()
+
+    private double xBorderLine;
+
+
+    private int locateProp()
+    {
+        int location = 0;
+        List<Recognition> currentRecognitions = tfod.getRecognitions();
+        if(currentRecognitions.size()==1) {
+            for (Recognition recognition : currentRecognitions) {
+                double x = (recognition.getLeft() + recognition.getRight()) / 2;
+                double y = (recognition.getTop() + recognition.getBottom()) / 2;
+
+                /* location 1*/
+                if (x<xBorderLine)
+                {
+                    location = 1;
+                }
+
+                else{
+                    location = 2;
+                }
+            }
+        }
+
+        else{
+            location = 3;
+        }
+        return location;
+    }
 
 }   // end class

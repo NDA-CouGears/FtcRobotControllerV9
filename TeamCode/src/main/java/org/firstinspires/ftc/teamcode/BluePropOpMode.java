@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 @Autonomous(name = "Blue Team Prop", group = "Team OpModes")
-public class BluePropOpMode extends TensorFlowObjectDetection {
+public class BluePropOpMode extends AutoMode {
     protected TfodProcessor getProcessor(){
         String[] labels = {"Blue Prop"};
         TfodProcessor newProcessor = new TfodProcessor.Builder()
@@ -16,5 +16,7 @@ public class BluePropOpMode extends TensorFlowObjectDetection {
                 .build();
         return newProcessor;
     }
+
+
 
 }
