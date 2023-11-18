@@ -29,6 +29,7 @@ abstract public class RobotParent extends LinearOpMode {
     private Servo clawLeftServo;
     private Servo clawRightServo;
     private Servo wristServo;
+    private Servo droneServo;
     private TouchSensor touchSensor;
 
 
@@ -54,13 +55,14 @@ abstract public class RobotParent extends LinearOpMode {
 
     static final double clawLeftServoMin = 0;
     static final double clawRightServoMin = 0;
-    static final double clawLeftServoMax = 0;
-    static final double clawRightServoMax = 0;
+    static final double clawLeftServoMax = 1;
+    static final double clawRightServoMax = 1;
     static final double wristServoMin = 0;
-    static final double wristServoMax = 0;
+    static final double wristServoMax = 1;
     static final double armPosMin = 0;
     static final double armPosMax = 0;
-
+    static final double droneServoMax = 1;
+    static final double droneServoMin = 0;
 
     protected void encoderDrive(double speed,
                                 double leftFrontInches,
@@ -182,6 +184,7 @@ abstract public class RobotParent extends LinearOpMode {
         clawLeftServo = hardwareMap.servo.get("servo1"); // port 1 on control hub
         clawRightServo = hardwareMap.servo.get("servo2"); // port 0 control hub
         wristServo = hardwareMap.servo.get("servo3"); // port 2 control hub
+        droneServo = hardwareMap.servo.get("servo4"); //port 3 on control hub
 
         winchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
@@ -216,6 +219,7 @@ abstract public class RobotParent extends LinearOpMode {
         winchMotor.setPower(winchPower);
     }
 
+
     protected void openLeftClaw(){
         clawLeftServo.setPosition(clawLeftServoMax);
     }
@@ -248,8 +252,8 @@ abstract public class RobotParent extends LinearOpMode {
         telemetry.addData("Motors", "arm Power(%.2f)", armPower);
         telemetry.addData("Motors", "arm Position(%.2f)", armPower);
         telemetry.addData("Servos", "wrist (%.2f)", wristPos);
-
     }
+
 
     protected void claw() {
         boolean leftBumper1 = gamepad1.left_bumper;
@@ -296,7 +300,7 @@ abstract public class RobotParent extends LinearOpMode {
         rightClawPosit = rightClawPosit + (gamepad1.right_stick_x*servoDelta);
         clawRightServo.setPosition(rightClawPosit);
 
-        double wristPosit = wristServo.getPosition(); //gamepad1.dpad_down
+        double wristPosit = wristServo.getPosition(); //gamepad1.dpad
         if(gamepad1.dpad_down){
             wristPosit -= servoDelta;
         }
@@ -305,6 +309,16 @@ abstract public class RobotParent extends LinearOpMode {
         }
         wristServo.setPosition(wristPosit);
 
+        double dronePosit = droneServo.getPosition(); //gamepad2.dpad
+        if(gamepad1.dpad_down){
+            dronePosit -=servoDelta;
+        }
+        else if(gamepad2.dpad_up){
+            dronePosit += servoDelta;
+        }
+        droneServo.setPosition(dronePosit);
+
+        /**
         if(gamepad1.y){
             Properties savedVal = new Properties();
             savedVal.setProperty("armMax", Double.toString(armPosit));
@@ -315,12 +329,14 @@ abstract public class RobotParent extends LinearOpMode {
             
             savedVal.store();
         }
+         **/
 
         telemetry.addData("ArmPos: ", armPosit);
         telemetry.addData("WinchPos: ", winchPosit);
         telemetry.addData("LClawPos: ", leftClawPosit);
         telemetry.addData("RClawPos: ", rightClawPosit);
         telemetry.addData("WristPos: ", wristPosit);
+        telemetry.addData("dronePos: ", dronePosit);
     }
 }
 
