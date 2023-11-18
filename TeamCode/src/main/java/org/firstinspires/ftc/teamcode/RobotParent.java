@@ -220,6 +220,12 @@ abstract public class RobotParent extends LinearOpMode {
         winchMotor.setPower(winchPower);
     }
 
+    protected void launchDrone(){
+        droneServo.setPosition(droneServoLaunch);
+    }
+    protected void resetDrone(){
+        droneServo.setPosition(droneServoLocked);
+    }
 
     protected void openLeftClaw(){
         clawLeftServo.setPosition(clawLeftServoOpen);
@@ -229,13 +235,21 @@ abstract public class RobotParent extends LinearOpMode {
     }
 
     protected void openRightClaw(){
-        clawLeftServo.setPosition(clawRightServoOpen);
+        clawRightServo.setPosition(clawRightServoOpen);
     }
     protected void closeRightClaw(){
-        clawLeftServo.setPosition(clawRightServoClosed);
+        clawRightServo.setPosition(clawRightServoClosed);
+    }
+
+    protected void drone(){
+        if(gamepad2.y){
+            launchDrone();
+        }
+        if(gamepad2.x){
+            resetDrone();
+        }
     }
     protected void ArmAndWrist() {
-
         double armPower = gamepad2.left_stick_y;
         double armPos = armMotor.getCurrentPosition();
         armPower = Range.clip(armPower, -1.0, 1.0);
