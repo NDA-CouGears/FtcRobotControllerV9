@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import java.util.Properties;
+
 
 abstract public class RobotParent extends LinearOpMode {
 
@@ -284,6 +286,17 @@ abstract public class RobotParent extends LinearOpMode {
             wristPosit += servoDelta;
         }
         wristServo.setPosition(wristPosit);
+
+        if(gamepad1.y){
+            Properties savedVal = new Properties();
+            savedVal.setProperty("armMax", Double.toString(armPosit));
+            savedVal.setProperty("winchMax", Double.toString(winchPosit));
+            savedVal.setProperty("leftClawMax", Double.toString(leftClawPosit));
+            savedVal.setProperty("rightClawMax", Double.toString(rightClawPosit));
+            savedVal.setProperty("wristMax", Double.toString(wristPosit));
+            
+            savedVal.store();
+        }
 
         telemetry.addData("ArmPos: ", armPosit);
         telemetry.addData("WinchPos: ", winchPosit);
