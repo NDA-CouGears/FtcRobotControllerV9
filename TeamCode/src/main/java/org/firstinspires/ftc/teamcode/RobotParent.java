@@ -53,16 +53,18 @@ abstract public class RobotParent extends LinearOpMode {
 //    static final double servoMax = 69;
 //    static final double servo2Max = 96;
 
-    static final double clawLeftServoMin = 0;
-    static final double clawRightServoMin = 0;
-    static final double clawLeftServoMax = 1;
-    static final double clawRightServoMax = 1;
-    static final double wristServoMin = 0;
-    static final double wristServoMax = 1;
-    static final double armPosMin = 0;
-    static final double armPosMax = 0;
-    static final double droneServoMax = 1;
-    static final double droneServoMin = 0;
+    static final double clawLeftServoOpen = 0;
+    static final double clawLeftServoClosed = 1;
+    static final double clawRightServoOpen = 0.0;
+    static final double clawRightServoClosed = 0.513;
+    static final double wristServoFloor = 0.22;
+    static final double wristServoBoardTop = 0.89;
+    static final double wristServoBoardBottom = 0.6894;
+    static final double armPosFloor = 0;
+    static final double armPosBoardTop = 12774;
+    static final double armPosBoardBottom = 15414;
+    static final double droneServoLocked = 1;
+    static final double droneServoLaunch = 38;
 
     protected void encoderDrive(double speed,
                                 double leftFrontInches,
@@ -93,7 +95,6 @@ abstract public class RobotParent extends LinearOpMode {
             leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
 
             telemetry.addData("Currently at", " at %7d :%7d",
                     leftFrontDrive.getCurrentPosition(), leftBackDrive.getCurrentPosition(),
@@ -221,32 +222,41 @@ abstract public class RobotParent extends LinearOpMode {
 
 
     protected void openLeftClaw(){
-        clawLeftServo.setPosition(clawLeftServoMax);
+        clawLeftServo.setPosition(clawLeftServoOpen);
     }
     protected void closeLeftClaw(){
-        clawLeftServo.setPosition(clawLeftServoMin);
+        clawLeftServo.setPosition(clawLeftServoClosed);
     }
 
     protected void openRightClaw(){
-        clawLeftServo.setPosition(clawRightServoMax);
+        clawLeftServo.setPosition(clawRightServoOpen);
     }
     protected void closeRightClaw(){
-        clawLeftServo.setPosition(clawRightServoMin);
+        clawLeftServo.setPosition(clawRightServoClosed);
     }
     protected void ArmAndWrist() {
 
         double armPower = gamepad2.left_stick_y;
+        double armPos = armMotor.getCurrentPosition();
         armPower = Range.clip(armPower, -1.0, 1.0);
         armMotor.setPower(armPower);
 
-        double wristAdjust = 0.02;
-        double wristPos = armMotor.getCurrentPosition() * wristAdjust;
-        wristServo.setPosition(wristPos);
+        double wristPos = 0;
+        if (armPos < armPosBoardTop) {
+            double wristAdjust = armPos/armPosBoardTop;
+            wristPos = wristServoFloor + (wristServoBoardTop-wristServoFloor) * wristAdjust;
+            wristServo.setPosition(wristPos);
+        }
+        else if (armPos >= armPosBoardTop && armPos < armPosBoardBottom) {
+            double wristAdjust = (armPos-armPosBoardTop)/(armPosBoardBottom-armPosBoardTop);
+            wristPos = wristServoBoardTop + (wristServoBoardBottom-wristServoBoardTop) * wristAdjust;
+            wristServo.setPosition(wristPos);
+        }
 
-        if (armMotor.getCurrentPosition() >= armPosMax) {
+        if (armMotor.getCurrentPosition() <= armPosFloor) {
             armMotor.setPower(0);
         }
-        if (armMotor.getCurrentPosition() >= armPosMax) {
+        if (armMotor.getCurrentPosition() >= armPosBoardBottom) {
             armMotor.setPower(0);
         }
         telemetry.addData("Motors", "arm Power(%.2f)", armPower);
@@ -256,25 +266,23 @@ abstract public class RobotParent extends LinearOpMode {
 
 
     protected void claw() {
-        boolean leftBumper1 = gamepad1.left_bumper;
-        boolean rightBumper1 = gamepad1.right_bumper;
-        boolean leftBumper2 = gamepad2.left_bumper;
-        boolean rightBumper2 = gamepad2.right_bumper;
+        boolean leftBumper = gamepad1.left_bumper;
+        boolean leftTrigger = gamepad1.left_trigger > 0.5;
+        boolean rightBumper = gamepad1.right_bumper;
+        boolean rightTrigger = gamepad1.right_trigger > 0.5;
 
-        if (leftBumper1) {
-            clawLeftServo.setPosition(clawLeftServoMin);
+        if (leftBumper) {
+            openLeftClaw();
+        }
+        if (leftTrigger) {
+            closeLeftClaw();
         }
 
-        if (rightBumper1) {
-            clawLeftServo.setPosition(clawLeftServoMax);
+        if (rightBumper) {
+            openRightClaw();
         }
-
-        if (leftBumper2) {
-            clawRightServo.setPosition(clawRightServoMin);
-        }
-
-        if (rightBumper2) {
-            clawRightServo.setPosition(clawRightServoMax);
+        if (rightTrigger) {
+            closeRightClaw();
         }
     }
 
@@ -310,7 +318,7 @@ abstract public class RobotParent extends LinearOpMode {
         wristServo.setPosition(wristPosit);
 
         double dronePosit = droneServo.getPosition(); //gamepad2.dpad
-        if(gamepad1.dpad_down){
+        if(gamepad2.dpad_down){
             dronePosit -=servoDelta;
         }
         else if(gamepad2.dpad_up){
