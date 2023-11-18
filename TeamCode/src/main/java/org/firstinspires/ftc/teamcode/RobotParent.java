@@ -144,7 +144,12 @@ abstract public class RobotParent extends LinearOpMode {
             sleep(250);   // optional pause after each move.
         }
     }
-
+    protected void turnLeft(){
+        encoderDrive(DRIVE_SPEED,   -26, 26, -26, 26,4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+    }
+    protected void turnRight(){
+        encoderDrive(DRIVE_SPEED,   26, -26, 26, -26,4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+    }
     protected void mecanumDrive() {
         double y = gamepad1.left_stick_y; // Remember, this is reversed!
         double x = gamepad1.left_stick_x * -1.1; // Counteract imperfect strafing
@@ -211,6 +216,19 @@ abstract public class RobotParent extends LinearOpMode {
         winchMotor.setPower(winchPower);
     }
 
+    protected void openLeftClaw(){
+        clawLeftServo.setPosition(clawLeftServoMax);
+    }
+    protected void closeLeftClaw(){
+        clawLeftServo.setPosition(clawLeftServoMin);
+    }
+
+    protected void openRightClaw(){
+        clawLeftServo.setPosition(clawRightServoMax);
+    }
+    protected void closeRightClaw(){
+        clawLeftServo.setPosition(clawRightServoMin);
+    }
     protected void ArmAndWrist() {
 
         double armPower = gamepad2.left_stick_y;
