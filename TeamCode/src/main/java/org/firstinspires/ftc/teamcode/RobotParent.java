@@ -7,6 +7,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.os.Environment;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -14,6 +16,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import java.io.FileOutputStream;
 import java.util.Properties;
 
 
@@ -54,7 +57,7 @@ abstract public class RobotParent extends LinearOpMode {
 //    static final double servo2Max = 96;
 
     static final double clawLeftServoOpen = 0;
-    static final double clawLeftServoClosed = 1;
+    static final double clawLeftServoClosed = 0.513;
     static final double clawRightServoOpen = 0.0;
     static final double clawRightServoClosed = 0.513;
     static final double wristServoFloor = 0.22;
@@ -64,7 +67,7 @@ abstract public class RobotParent extends LinearOpMode {
     static final double armPosBoardTop = 12774;
     static final double armPosBoardBottom = 15414;
     static final double droneServoLocked = 1;
-    static final double droneServoLaunch = 38;
+    static final double droneServoLaunch = 0.38;
 
     protected void encoderDrive(double speed,
                                 double leftFrontInches,
@@ -267,12 +270,16 @@ abstract public class RobotParent extends LinearOpMode {
             wristServo.setPosition(wristPos);
         }
 
+        /*
+        Not stopping from going outside range, needs more though
         if (armMotor.getCurrentPosition() <= armPosFloor) {
             armMotor.setPower(0);
         }
         if (armMotor.getCurrentPosition() >= armPosBoardBottom) {
             armMotor.setPower(0);
         }
+        */
+
         telemetry.addData("Motors", "arm Power(%.2f)", armPower);
         telemetry.addData("Motors", "arm Position(%.2f)", armPower);
         telemetry.addData("Servos", "wrist (%.2f)", wristPos);
@@ -301,7 +308,6 @@ abstract public class RobotParent extends LinearOpMode {
     }
 
     protected void calibrationAndTelemetry() {
-
         double servoDelta = 0.005;
 
         double armPosit = armMotor.getCurrentPosition(); //gamepad1.left_stick_y
@@ -340,7 +346,8 @@ abstract public class RobotParent extends LinearOpMode {
         }
         droneServo.setPosition(dronePosit);
 
-        /**
+        /*
+        //Save
         if(gamepad1.y){
             Properties savedVal = new Properties();
             savedVal.setProperty("armMax", Double.toString(armPosit));
@@ -348,10 +355,20 @@ abstract public class RobotParent extends LinearOpMode {
             savedVal.setProperty("leftClawMax", Double.toString(leftClawPosit));
             savedVal.setProperty("rightClawMax", Double.toString(rightClawPosit));
             savedVal.setProperty("wristMax", Double.toString(wristPosit));
-            
-            savedVal.store();
+            String propPath = String.format("%s/caliration.properties", Environment.getExternalStorageDirectory().getAbsolutePath());
+            try {
+                FileOutputStream propStream = new FileOutputStream(propPath);
+                savedVal.store(propStream, "Calibration Vals");
+            }
+            catch (Exception ex){
+                telemetry.addData("exception: ", ex.getMessage());
+            }
         }
-         **/
+         */
+
+
+
+
 
         telemetry.addData("ArmPos: ", armPosit);
         telemetry.addData("WinchPos: ", winchPosit);
