@@ -62,7 +62,7 @@ public abstract class AutoMode extends RobotParent {
 
     @Override
     public void runOpMode() {
-
+        initHardware();
         initTfod();
 
         // Wait for the DS start button to be touched.
