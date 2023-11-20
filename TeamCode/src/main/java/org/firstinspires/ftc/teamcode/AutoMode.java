@@ -78,6 +78,7 @@ public abstract class AutoMode extends RobotParent {
 
                 // Push telemetry to the Driver Station.
                 telemetry.update();
+                int location = locateProp();
 
                 // Save CPU resources; can resume streaming when needed.
                 if (gamepad1.dpad_down) {
@@ -87,7 +88,20 @@ public abstract class AutoMode extends RobotParent {
                 }
 
                 // Share the CPU.
+
                 sleep(20);
+                if (location == 1){
+//            encoderDrive();
+                }
+                if (location == 2){
+//            encoderDrive();
+                }
+                if (location == 3){
+//            encoderDrive();
+                }
+
+                //Drop the claw at the right location
+                openLeftClaw();
             }
         }
 
@@ -120,20 +134,10 @@ public abstract class AutoMode extends RobotParent {
                 .setAutoStopLiveView(true)
                 .build();
 
-        int location = locateProp();
 
-        if (location == 1){
-//            encoderDrive();
-            openLeftClaw();
-        }
-        if (location == 2){
-//            encoderDrive();
-            openLeftClaw();
-        }
-        if (location == 3){
-//            encoderDrive();
-            openLeftClaw();
-        }
+
+
+        //
 
     }   // end method initTfod()
 
