@@ -165,31 +165,21 @@ public abstract class AutoMode extends RobotParent {
     private double xBorderLine;
 
 
-    private int locateProp()
-    {
+    private int locateProp() {
         int location = 0;
+
+        encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 5.0);
         List<Recognition> currentRecognitions = tfod.getRecognitions();
-        if(currentRecognitions.size()==1) {
-            for (Recognition recognition : currentRecognitions) {
-                double x = (recognition.getLeft() + recognition.getRight()) / 2;
-                double y = (recognition.getTop() + recognition.getBottom()) / 2;
-
-                /* location 1*/
-                if (x<xBorderLine)
-                {
-                    location = 1;
-                }
-
-                else{
-                    location = 2;
-                }
-            }
+        if (currentRecognitions.size() == 1) {
+            location = 1;
         }
-
+        else if (currentRecognitions.size() == 1){
+            encoderDrive(DRIVE_SPEED, -26, 26, 26, -26, 4.0);
+            location = 2;
+        }
         else{
             location = 3;
         }
         return location;
     }
-
 }   // end class
