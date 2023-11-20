@@ -79,6 +79,8 @@ public abstract class AutoMode extends RobotParent {
                 // Push telemetry to the Driver Station.
                 telemetry.update();
                 int location = locateProp();
+                telemetry.addData("Position: ", location);
+
 
                 // Save CPU resources; can resume streaming when needed.
                 if (gamepad1.dpad_down) {
