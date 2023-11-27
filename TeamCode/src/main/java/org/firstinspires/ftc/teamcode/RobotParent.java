@@ -69,7 +69,9 @@ abstract public class RobotParent extends LinearOpMode {
     static final double armPosBoardBottom = 15414;
     static final double droneServoLocked = 1;
     static final double droneServoLaunch = 0.38;
-
+    private boolean winchLock = false;
+    private double winchLockPos = 0;
+    private boolean winchErrorCorrector = false;
     protected void encoderDrive(double speed,
                                 double leftFrontInches,
                                 double rightFrontInches,
@@ -222,6 +224,21 @@ abstract public class RobotParent extends LinearOpMode {
         double winchPower = gamepad2.right_stick_y;
         winchPower = Range.clip(winchPower, -1.0, 1.0);
         winchMotor.setPower(winchPower);
+        if (gamepad2.b){
+            winchLock = !winchLock;
+            winchLockPos = winchMotor.getCurrentPosition();
+        }
+        if(winchLock){
+            if (winchMotor.getCurrentPosition() > (winchLockPos + 20)){
+                winchErrorCorrector = true;
+            }
+            if(winchErrorCorrector){
+                winchMotor.setPower(-0.5);
+            }
+            if(winchMotor.getCurrentPosition() <= (winchLockPos - 20)){
+                winchErrorCorrector = false;
+            }
+        }
     }
 
     protected void launchDrone(){
