@@ -104,6 +104,12 @@ public abstract class AutoMode extends RobotParent {
 
                 //Drop the claw at the right location
                 openLeftClaw();
+
+                //Drive forward
+//                encoderDrive();
+
+
+
             }
         }
 
@@ -166,8 +172,16 @@ public abstract class AutoMode extends RobotParent {
 
     private double xBorderLine;
 
+    private void longPath()
+    {
+        //encoderDrive();
+    }
 
-    private int locateProp() {
+    private void shortPath()
+    {
+        //encoderDrive();
+    }
+    private int locateBlueProp() {
         int location = 0;
 
         encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 5.0);
@@ -176,6 +190,26 @@ public abstract class AutoMode extends RobotParent {
             location = 1;
         }
         else if (currentRecognitions.size() == 1){
+            //move to the right a bit to identify prop on the right position
+            encoderDrive(DRIVE_SPEED, 26, -26, -26, 26, 4.0);
+            location = 2;
+        }
+        else{
+            location = 3;
+        }
+        return location;
+    }
+
+    private int locateRedProp() {
+        int location = 0;
+
+        encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 5.0);
+        List<Recognition> currentRecognitions = tfod.getRecognitions();
+        if (currentRecognitions.size() == 1) {
+            location = 1;
+        }
+        else if (currentRecognitions.size() == 1){
+            //move to the left a little bit to identify prop on the left position
             encoderDrive(DRIVE_SPEED, -26, 26, 26, -26, 4.0);
             location = 2;
         }

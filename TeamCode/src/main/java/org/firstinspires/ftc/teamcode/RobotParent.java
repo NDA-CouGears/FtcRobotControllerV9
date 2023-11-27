@@ -367,9 +367,6 @@ abstract public class RobotParent extends LinearOpMode {
          */
 
 
-
-
-
         telemetry.addData("ArmPos: ", armPosit);
         telemetry.addData("WinchPos: ", winchPosit);
         telemetry.addData("LClawPos: ", leftClawPosit);
