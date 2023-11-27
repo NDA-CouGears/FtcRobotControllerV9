@@ -45,21 +45,23 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-/*
+
 public abstract class AutoMode extends RobotParent {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-//    private static final String TFOD_MODEL_FILE ="file:///android_asset/quuen1.tflite" ;
-*/
+    private static final String TFOD_MODEL_FILE ="file:///android_asset/quuen1.tflite" ;
+    private static int direction = 1; // set default direction to right for sliding
+
+
     /**
      * The variable to store our instance of the TensorFlow Object Detection processor.
      */
-   // private TfodProcessor tfod;
+    private TfodProcessor tfod;
 
     /**
      * The variable to store our instance of the vision portal.
      */
-    /*
+
     private VisionPortal visionPortal;
 
     @Override
@@ -77,11 +79,78 @@ public abstract class AutoMode extends RobotParent {
             while (opModeIsActive()) {
 
                 telemetryTfod();
-
                 // Push telemetry to the Driver Station.
                 telemetry.update();
-                int location = locateProp();
+
+                if ((isRed() && isFar()) || (isBlue() && isNear())) //set slide direction to left
+                {
+                    direction = -1;
+                }
+
+                int location = locateProp(); // identify where is the team prop
                 telemetry.addData("Position: ", location);
+                // move to the prep pos before drop off the pixel
+                slide(direction, 10);
+                encoderDrive(DRIVE_SPEED, 45, 45, 45, 45, 20.0);
+
+                // different scenerio
+
+                if (location == 2){
+                    slide (-direction, 23);
+                    dropPixel();
+                }
+
+                else if (location == 3){
+                    slide(-direction, 13);
+                    encoderDrive(DRIVE_SPEED, -9, -9, -9, -9, 10.0); // back up to drop the pixel
+                    dropPixel();
+                    encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 10.0); // back up to drop the pixel
+                    slide(-direction, 10);
+                }
+
+                else if (location == 1){
+                    slide (-direction, 23);
+                    encoderDrive(DRIVE_SPEED, -9, -9, -9, -9, 10.0); // back up to drop the pixel
+                    turn(direction,10);
+                    dropPixel();
+                    turn (-direction,10);
+                    encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 10.0); // back up to drop the pixel
+                }
+
+                else{ // identify failed, can circle back to gain some basic points
+
+                }
+
+                // if far, drive to the position where close one ends
+                if (isFar()){
+                    slide(-direction,40);
+                }
+
+                // turn to face the board
+                if (isBlue()) {
+                    turnLeft90();
+                    if (location == 1){
+                        slide(-direction, 40);
+                    }
+                    else if(location == 2){
+                        slide(-direction, 30);
+                    }
+                    else{
+                        slide(-direction,20);
+                    }
+                }
+                else{
+                    turnRight90();
+                    if (location == 1){
+                        slide(direction, 40);
+                    }
+                    else if(location == 2){
+                        slide(direction, 30);
+                    }
+                    else{
+                        slide(direction,20);
+                    }
+                }
 
 
                 // Save CPU resources; can resume streaming when needed.
@@ -94,22 +163,6 @@ public abstract class AutoMode extends RobotParent {
                 // Share the CPU.
 
                 sleep(20);
-                if (location == 1){
-//            encoderDrive();
-                }
-                if (location == 2){
-//            encoderDrive();
-                }
-                if (location == 3){
-//            encoderDrive();
-                }
-
-                //Drop the claw at the right location
-                openLeftClaw();
-
-                //Drive forward
-//                encoderDrive();
-
 
 
             }
@@ -120,12 +173,17 @@ public abstract class AutoMode extends RobotParent {
 
     }   // end runOpMode()
 
+//    determine red & blue, far & near
     abstract protected TfodProcessor getProcessor();
-*/
+    private boolean isRed(){return !isBlue();}
+    private boolean isFar(){return !isNear();}
+    abstract protected boolean isBlue();
+    abstract protected boolean isNear();
+
     /**
      * Initialize the TensorFlow Object Detection processor.
      */
-    /*
+
     private void initTfod() {
 
         // Create the TensorFlow processor the easy way.
@@ -133,7 +191,6 @@ public abstract class AutoMode extends RobotParent {
 //        String[] labels = {"Red Prop"};
 
         tfod = getProcessor();
-
         // Create the vision portal the easy way.
         // visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam1"), tfod);
         visionPortal = new VisionPortal.Builder()
@@ -151,11 +208,11 @@ public abstract class AutoMode extends RobotParent {
         //
 
     }   // end method initTfod()
-*/
+
     /**
      * Add telemetry about TensorFlow Object Detection (TFOD) recognitions.
      */
-    /*
+
     private void telemetryTfod() {
 
         List<Recognition> currentRecognitions = tfod.getRecognitions();
@@ -174,53 +231,58 @@ public abstract class AutoMode extends RobotParent {
 
     }   // end method telemetryTfod()
 
-    private double xBorderLine;
 
-    private void longPath()
-    {
-        //encoderDrive();
-    }
-
-    private void shortPath()
-    {
-        //encoderDrive();
-    }
-    private int locateBlueProp() {
+    private int locateProp() {
         int location = 0;
 
-        encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 5.0);
+        encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 5.0); // move a little bit forward to see clearly and identify better
         List<Recognition> currentRecognitions = tfod.getRecognitions();
-        if (currentRecognitions.size() == 1) {
-            location = 1;
-        }
-        else if (currentRecognitions.size() == 1){
-            //move to the right a bit to identify prop on the right position
-            encoderDrive(DRIVE_SPEED, 26, -26, -26, 26, 4.0);
+        if (currentRecognitions.size() == 1) { // if team prop is recognized at straight position
             location = 2;
+            slide(direction,10);
         }
-        else{
-            location = 3;
+        else {
+            slide (direction, 10);         //move to the right a bit to identify prop on the right position
+            sleep (3000);
+            currentRecognitions = tfod.getRecognitions();
+            if (currentRecognitions.size() == 1) { // if team prop is recognized at right position
+                location = 3;
+            }
+            else{
+                location = 1;
+            }
         }
         return location;
     }
 
-    private int locateRedProp() {
-        int location = 0;
+    private void slide (int direction, int inches){
+        if (direction == 1){ // slide to right
+            encoderDrive(DRIVE_SPEED, inches , -inches, -inches, inches, 10.0);
+        }
+        if (direction == -1){ // slide to left
+            encoderDrive(DRIVE_SPEED, -inches , inches, inches, -inches, 10.0);
+        }
+    }
 
-        encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 5.0);
-        List<Recognition> currentRecognitions = tfod.getRecognitions();
-        if (currentRecognitions.size() == 1) {
-            location = 1;
+
+    private void turn (int direction, int degrees){
+        if (direction == 1) { // turn right in a cerntain degrees
+            encoderDrive(DRIVE_SPEED, degrees, degrees, -degrees, -degrees, 10.0);
         }
-        else if (currentRecognitions.size() == 1){
-            //move to the left a little bit to identify prop on the left position
-            encoderDrive(DRIVE_SPEED, -26, 26, 26, -26, 4.0);
-            location = 2;
+
+        if (direction == -1) { // turn right in a cerntain degrees
+            encoderDrive(DRIVE_SPEED, -degrees, -degrees, degrees, degrees, 10.0);
         }
-        else{
-            location = 3;
-        }
-        return location;
+    }
+    // drop pixel at the line
+    private void dropPixel(){
+        openLeftClaw();
+    }
+
+    protected void turnLeft90(){
+        encoderDrive(DRIVE_SPEED,   -26, 26, -26, 26,4.0);
+    }
+    protected void turnRight90(){
+        encoderDrive(DRIVE_SPEED,   26, -26, 26, -26,4.0);
     }
 }   // end class
-*/
