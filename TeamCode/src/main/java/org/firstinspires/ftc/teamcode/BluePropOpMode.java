@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
-
+/*
 @Autonomous(name = "Blue Team Prop", group = "Team OpModes")
 public class BluePropOpMode extends AutoMode {
     protected TfodProcessor getProcessor(){
@@ -16,7 +16,6 @@ public class BluePropOpMode extends AutoMode {
                 .build();
         return newProcessor;
     }
-
-
-
 }
+
+*/

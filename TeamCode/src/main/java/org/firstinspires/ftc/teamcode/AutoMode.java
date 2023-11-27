@@ -45,19 +45,21 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
+/*
 public abstract class AutoMode extends RobotParent {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 //    private static final String TFOD_MODEL_FILE ="file:///android_asset/quuen1.tflite" ;
-
+*/
     /**
      * The variable to store our instance of the TensorFlow Object Detection processor.
      */
-    private TfodProcessor tfod;
+   // private TfodProcessor tfod;
 
     /**
      * The variable to store our instance of the vision portal.
      */
+    /*
     private VisionPortal visionPortal;
 
     @Override
@@ -119,10 +121,11 @@ public abstract class AutoMode extends RobotParent {
     }   // end runOpMode()
 
     abstract protected TfodProcessor getProcessor();
-
+*/
     /**
      * Initialize the TensorFlow Object Detection processor.
      */
+    /*
     private void initTfod() {
 
         // Create the TensorFlow processor the easy way.
@@ -148,10 +151,11 @@ public abstract class AutoMode extends RobotParent {
         //
 
     }   // end method initTfod()
-
+*/
     /**
      * Add telemetry about TensorFlow Object Detection (TFOD) recognitions.
      */
+    /*
     private void telemetryTfod() {
 
         List<Recognition> currentRecognitions = tfod.getRecognitions();
@@ -219,3 +223,4 @@ public abstract class AutoMode extends RobotParent {
         return location;
     }
 }   // end class
+*/

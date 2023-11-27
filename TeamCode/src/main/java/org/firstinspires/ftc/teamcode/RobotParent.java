@@ -11,6 +11,7 @@ import android.os.Environment;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -181,22 +182,22 @@ abstract public class RobotParent extends LinearOpMode {
         // Initialize the drive system variables.
         leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive"); //port 0 on control hub
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive"); //port 1 on control hub
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive"); //port 0 on expansion hub
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive"); //port 1 on expansion hub
-        armMotor = hardwareMap.get(DcMotor.class, "arm_motor"); // port 2 on expansion hub
-        winchMotor = hardwareMap.get(DcMotor.class, "winch_motor"); // port 3 on expansion hub
-        clawLeftServo = hardwareMap.servo.get("servo1"); // port 1 on control hub
-        clawRightServo = hardwareMap.servo.get("servo2"); // port 0 control hub
-        wristServo = hardwareMap.servo.get("servo3"); // port 2 control hub
-        droneServo = hardwareMap.servo.get("servo4"); //port 3 on control hub
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive"); //port 0 on ex hub
+        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive"); //port 1 on ex hub
+        armMotor = hardwareMap.get(DcMotor.class, "arm_motor"); // port 2 on control hub
+        winchMotor = hardwareMap.get(DcMotor.class, "winch_motor"); // port 3 on control hub
+        clawLeftServo = hardwareMap.servo.get("servo1"); // port 0 on ex hub
+        clawRightServo = hardwareMap.servo.get("servo2"); // port 1 ex hub
+        wristServo = hardwareMap.servo.get("servo3"); // port 2 ex hub
+        droneServo = hardwareMap.servo.get("servo4"); //port 3 on ex hub
 
         winchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
         // setting direction for motors
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
         armMotor.setDirection(DcMotor.Direction.FORWARD);
         winchMotor.setDirection(DcMotor.Direction.FORWARD);
 
