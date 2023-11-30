@@ -82,16 +82,18 @@ public abstract class AutoMode extends RobotParent {
                 // Push telemetry to the Driver Station.
                 telemetry.update();
 
+
                 if ((isRed() && isFar()) || (isBlue() && isNear())) //set slide direction to left
                 {
                     direction = -1;
                 }
-
+                telemetry.addData("direction: ", direction);
+                sleep(3000);
                 int location = locateProp(); // identify where is the team prop
-                telemetry.addData("Position: ", location);
+                telemetry.addData("Position x: ", location);
                 // move to the prep pos before drop off the pixel
                 slide(direction, 10);
-                encoderDrive(DRIVE_SPEED, 45, 45, 45, 45, 20.0);
+                encoderDrive(DRIVE_SPEED, 42, 42, 42, 42, 20.0);
 
                 // different scenerio
 
@@ -237,9 +239,14 @@ public abstract class AutoMode extends RobotParent {
 
         encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 5.0); // move a little bit forward to see clearly and identify better
         List<Recognition> currentRecognitions = tfod.getRecognitions();
+        telemetry.addData("Position in method x: ", location);
+
+        sleep(3000);
         if (currentRecognitions.size() == 1) { // if team prop is recognized at straight position
             location = 2;
-            slide(direction,10);
+            telemetry.addData("Position method recognized: ", location);
+
+//            slide(direction,10);
         }
         else {
             slide (direction, 10);         //move to the right a bit to identify prop on the right position
@@ -247,9 +254,11 @@ public abstract class AutoMode extends RobotParent {
             currentRecognitions = tfod.getRecognitions();
             if (currentRecognitions.size() == 1) { // if team prop is recognized at right position
                 location = 3;
+                telemetry.addData("Position method recognized: ", location);
             }
             else{
                 location = 1;
+                telemetry.addData("Position method recognized: ", location);
             }
         }
         return location;

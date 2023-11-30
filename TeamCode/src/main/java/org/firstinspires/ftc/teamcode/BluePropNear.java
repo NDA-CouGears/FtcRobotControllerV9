@@ -3,7 +3,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
-@Autonomous(name = "Blue Team Prop Near", group = "Team OpModes")
+@Autonomous(name = "Blue Team Prop Near 1", group = "Team OpModes")
 public class BluePropNear extends AutoMode {
     protected TfodProcessor getProcessor(){
         String[] labels = {"Blue Prop"};
