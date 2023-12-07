@@ -246,6 +246,9 @@ public abstract class AutoMode extends RobotParent {
 //            slide(direction,10);
         }
         else {
+            if (isRed()){
+                slide(-direction,3);
+            }
             turn (direction, 4.725);         //move to the right a bit to identify prop on the right position
              trys = 1;
             while (currentRecognitions.size() == 0 && trys < 15) {
@@ -264,6 +267,9 @@ public abstract class AutoMode extends RobotParent {
                 location = 1;
                 telemetry.addData("Position method recognized: ", location);
                 turn(-direction,4.725);
+            }
+            if (isRed()){
+                slide(direction,3);
             }
         }
         return location;
