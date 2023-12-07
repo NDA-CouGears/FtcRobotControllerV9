@@ -88,34 +88,34 @@ public abstract class AutoMode extends RobotParent {
                     direction = -1;
                 }
                 telemetry.addData("direction: ", direction);
-                sleep(3000);
                 int location = locateProp(); // identify where is the team prop
                 telemetry.addData("Position x: ", location);
                 // move to the prep pos before drop off the pixel
-                slide(direction, 10);
-                encoderDrive(DRIVE_SPEED, 42, 42, 42, 42, 20.0);
+                slide(direction, 25);
+                encoderDrive(DRIVE_SPEED, 38, 38, 38, 38, 20.0);
 
                 // different scenerio
 
                 if (location == 2){
-                    slide (-direction, 23);
+                    slide (-direction, 14);
+                    encoderDrive(DRIVE_SPEED, 7, 7, 7, 7, 10.0); // back up to drop the pixel
                     dropPixel();
                 }
 
                 else if (location == 3){
-                    slide(-direction, 13);
-                    encoderDrive(DRIVE_SPEED, -9, -9, -9, -9, 10.0); // back up to drop the pixel
-                    dropPixel();
-                    encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 10.0); // back up to drop the pixel
                     slide(-direction, 10);
+                    encoderDrive(DRIVE_SPEED, -4, -4, -4, -4, 10.0); // back up to drop the pixel
+                    dropPixel();
+                    encoderDrive(DRIVE_SPEED, 11, 11, 11, 11, 10.0); // back up to drop the pixel
+                    slide(-direction, 4);
                 }
 
                 else if (location == 1){
-                    slide (-direction, 23);
+                    slide (-direction, 25);
                     encoderDrive(DRIVE_SPEED, -9, -9, -9, -9, 10.0); // back up to drop the pixel
-                    turn(direction,10);
+                    turn(direction,9);
                     dropPixel();
-                    turn (-direction,10);
+                    //turn (-direction,9);
                     encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 10.0); // back up to drop the pixel
                 }
 
@@ -237,11 +237,17 @@ public abstract class AutoMode extends RobotParent {
     private int locateProp() {
         int location = 0;
 
-        encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 5.0); // move a little bit forward to see clearly and identify better
+        encoderDrive(DRIVE_SPEED, 7 , 7, 7, 7, 5.0);
+        sleep(100);
         List<Recognition> currentRecognitions = tfod.getRecognitions();
-        telemetry.addData("Position in method x: ", location);
-
-        sleep(3000);
+        int trys = 1;
+        while (currentRecognitions.size() == 0 && trys < 10) {
+            telemetry.addData("First recognization failed, try times", trys);
+            telemetry.update();
+            sleep(100);
+            currentRecognitions = tfod.getRecognitions();
+            trys++;
+        }
         if (currentRecognitions.size() == 1) { // if team prop is recognized at straight position
             location = 2;
             telemetry.addData("Position method recognized: ", location);
@@ -249,16 +255,18 @@ public abstract class AutoMode extends RobotParent {
 //            slide(direction,10);
         }
         else {
-            slide (direction, 10);         //move to the right a bit to identify prop on the right position
-            sleep (3000);
+            turn (direction, 5);         //move to the right a bit to identify prop on the right position
+            sleep (100);
             currentRecognitions = tfod.getRecognitions();
             if (currentRecognitions.size() == 1) { // if team prop is recognized at right position
                 location = 3;
                 telemetry.addData("Position method recognized: ", location);
+                turn (-direction,5);
             }
             else{
                 location = 1;
                 telemetry.addData("Position method recognized: ", location);
+                turn(-direction,4.725);
             }
         }
         return location;
@@ -274,7 +282,7 @@ public abstract class AutoMode extends RobotParent {
     }
 
 
-    private void turn (int direction, int degrees){
+    private void turn (int direction, double degrees){
         if (direction == 1) { // turn right in a cerntain degrees
             encoderDrive(DRIVE_SPEED, degrees, degrees, -degrees, -degrees, 10.0);
         }
@@ -286,6 +294,7 @@ public abstract class AutoMode extends RobotParent {
     // drop pixel at the line
     private void dropPixel(){
         openLeftClaw();
+        openRightClaw();
     }
 
     protected void turnLeft90(){

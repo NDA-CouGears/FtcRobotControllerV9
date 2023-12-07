@@ -57,16 +57,16 @@ abstract public class RobotParent extends LinearOpMode {
 //    static final double servoMax = 69;
 //    static final double servo2Max = 96;
 
-    static final double clawLeftServoOpen = 0;
-    static final double clawLeftServoClosed = 0.513;
-    static final double clawRightServoOpen = 0.0;
-    static final double clawRightServoClosed = 0.513;
-    static final double wristServoFloor = 0.22;
-    static final double wristServoBoardTop = 0.89;
-    static final double wristServoBoardBottom = 0.6894;
-    static final double armPosFloor = 0;
-    static final double armPosBoardTop = 12774;
-    static final double armPosBoardBottom = 15414;
+    static final double clawLeftServoOpen = .5;
+    static final double clawLeftServoClosed = 0.99;
+    static final double clawRightServoOpen = 0.785;
+    static final double clawRightServoClosed = 0.278;
+    static final double wristServoFloor = 0.216;
+    static final double wristServoBoardTop = 0.940;
+    static final double wristServoBoardBottom = 0.709;
+    static final double armPosFloor = 1000;
+    static final double armPosBoardTop = 14410;
+    static final double armPosBoardBottom = 17194;
     static final double droneServoLocked = 1;
     static final double droneServoLaunch = 0.38;
     private boolean winchLock = false;
@@ -85,7 +85,6 @@ abstract public class RobotParent extends LinearOpMode {
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
-
             // Determine new target position, and pass to motor controller
             newLeftFrontTarget = leftFrontDrive.getCurrentPosition() - (int) (25.4 * leftFrontInches * COUNTS_PER_MM);
             newLeftBackTarget = leftBackDrive.getCurrentPosition() - (int) (25.4 * leftBackInches * COUNTS_PER_MM);
@@ -106,7 +105,6 @@ abstract public class RobotParent extends LinearOpMode {
                     leftFrontDrive.getCurrentPosition(), leftBackDrive.getCurrentPosition(),
                     rightFrontDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition());
             telemetry.update();
-            sleep(500);
 
             // reset the timeout time and start motion.
             runtime.reset();
@@ -139,18 +137,14 @@ abstract public class RobotParent extends LinearOpMode {
             rightFrontDrive.setPower(0);
             rightBackDrive.setPower(0);
 
-            telemetry.addData("Running to", " %7d :%7d", newLeftFrontTarget, newLeftBackTarget, newRightFrontTarget, newRightBackTarget);
+            telemetry.addData("Moved to", " %7d :%7d", newLeftFrontTarget, newLeftBackTarget, newRightFrontTarget, newRightBackTarget);
             telemetry.update();
-            sleep(500);
-
 
             // Turn off RUN_TO_POSITION
             leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            sleep(250);   // optional pause after each move.
         }
     }
 
@@ -187,6 +181,7 @@ abstract public class RobotParent extends LinearOpMode {
         clawRightServo = hardwareMap.servo.get("servo2"); // port 1 ex hub
         wristServo = hardwareMap.servo.get("servo3"); // port 2 ex hub
         droneServo = hardwareMap.servo.get("servo4"); //port 3 on ex hub
+        touchSensor = hardwareMap.get(TouchSensor.class, "arm_zero");
 
         winchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
@@ -200,6 +195,7 @@ abstract public class RobotParent extends LinearOpMode {
 
         //Setting Encorders for motors
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -258,17 +254,24 @@ abstract public class RobotParent extends LinearOpMode {
     }
 
     protected void drone(){
-        if(gamepad2.y){
+        if(gamepad1.x && gamepad1.b){
             launchDrone();
         }
-        if(gamepad2.x){
-            resetDrone();
-        }
+//        if(gamepad2.x){
+//            resetDrone();
+//        }
     }
     protected void ArmAndWrist() {
-        double armPower = gamepad2.left_stick_y;
+
+        double armPower = -gamepad2.left_stick_y;
         double armPos = armMotor.getCurrentPosition();
         armPower = Range.clip(armPower, -1.0, 1.0);
+        if (!touchSensor.isPressed()) {
+            armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            if (armPower < 0)
+                armPower = 0;
+        }
         armMotor.setPower(armPower);
 
         double wristPos = 0;
@@ -283,15 +286,25 @@ abstract public class RobotParent extends LinearOpMode {
             wristServo.setPosition(wristPos);
         }
 
-        /*
-        Not stopping from going outside range, needs more though
-        if (armMotor.getCurrentPosition() <= armPosFloor) {
-            armMotor.setPower(0);
-        }
-        if (armMotor.getCurrentPosition() >= armPosBoardBottom) {
-            armMotor.setPower(0);
-        }
-        */
+//        if(gamepad2.y){
+//            armMotor.setTargetPosition((int)armPosFloor);
+//            // Turn On RUN_TO_POSITION
+//            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            armMotor.setPower(1);
+//            wristServo.setPosition(wristServoFloor);
+//            runtime.reset();
+//            while (opModeIsActive() &&
+//                    (runtime.seconds() < 30)&&
+//                    (armMotor.isBusy())) {
+//                telemetry.addData("Anything", "");
+//            }
+//
+//            // Stop all motion;
+//            armMotor.setPower(0);
+//
+//            // Turn off RUN_TO_POSITION
+//            armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        }
 
         telemetry.addData("Motors", "arm Power(%.2f)", armPower);
         telemetry.addData("Motors", "arm Position(%.2f)", armPower);
@@ -300,10 +313,10 @@ abstract public class RobotParent extends LinearOpMode {
 
 
     protected void claw() {
-        boolean leftBumper = gamepad1.left_bumper;
-        boolean leftTrigger = gamepad1.left_trigger > 0.5;
-        boolean rightBumper = gamepad1.right_bumper;
-        boolean rightTrigger = gamepad1.right_trigger > 0.5;
+        boolean leftBumper = gamepad2.left_bumper;
+        boolean leftTrigger = gamepad2.left_trigger > 0.5;
+        boolean rightBumper = gamepad2.right_bumper;
+        boolean rightTrigger = gamepad2.right_trigger > 0.5;
 
         if (leftBumper) {
             openLeftClaw();
@@ -326,6 +339,12 @@ abstract public class RobotParent extends LinearOpMode {
         double armPosit = armMotor.getCurrentPosition(); //gamepad1.left_stick_y
         double armPow = gamepad1.left_stick_y;
         armPow = Range.clip(armPow, -1.0, 1.0);
+        if (!touchSensor.isPressed()) {
+            armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            if (armPow < 0)
+                armPow = 0;
+        }
         armMotor.setPower(armPow);
 
         double winchPosit = winchMotor.getCurrentPosition(); //gamepad2.right_stick_y
@@ -386,6 +405,8 @@ abstract public class RobotParent extends LinearOpMode {
         telemetry.addData("RClawPos: ", rightClawPosit);
         telemetry.addData("WristPos: ", wristPosit);
         telemetry.addData("dronePos: ", dronePosit);
+        telemetry.addData("touch sensor is : ", !touchSensor.isPressed());
+
     }
 }
 

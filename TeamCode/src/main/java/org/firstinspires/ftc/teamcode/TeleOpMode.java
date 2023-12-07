@@ -70,6 +70,7 @@ public class TeleOpMode extends RobotParent {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        resetDrone();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
