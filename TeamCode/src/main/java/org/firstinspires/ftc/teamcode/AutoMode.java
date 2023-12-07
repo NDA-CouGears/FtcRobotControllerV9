@@ -76,88 +76,83 @@ public abstract class AutoMode extends RobotParent {
         waitForStart();
 
         if (opModeIsActive()) {
-            while (opModeIsActive()) {
-
-                telemetryTfod();
-                // Push telemetry to the Driver Station.
-                telemetry.update();
+            telemetryTfod();
+            // Push telemetry to the Driver Station.
+            telemetry.update();
 
 
-                if ((isRed() && isFar()) || (isBlue() && isNear())) //set slide direction to left
-                {
-                    direction = -1;
-                }
-                telemetry.addData("direction: ", direction);
-                int location = locateProp(); // identify where is the team prop
-                telemetry.addData("Position x: ", location);
-                // move to the prep pos before drop off the pixel
-                slide(direction, 25);
-                encoderDrive(DRIVE_SPEED, 35, 35, 35, 35, 20.0);
+            if ((isRed() && isFar()) || (isBlue() && isNear())) //set slide direction to left
+            {
+                direction = -1;
+            }
+            telemetry.addData("direction: ", direction);
+            int location = locateProp(); // identify where is the team prop
+            telemetry.addData("Position x: ", location);
+            // move to the prep pos before drop off the pixel
+            slide(direction, 25);
+            encoderDrive(DRIVE_SPEED, 35, 35, 35, 35, 20.0);
 
-                // different scenerio
+            // different scenerio
 
-                if (location == 2){
-                    slide (-direction, 16);
-                    dropPixel();
-                    encoderDrive(DRIVE_SPEED, 5, 5, 5, 5, 10.0); // back up to drop the pixel
-                }
+            if (location == 2){
+                slide (-direction, 16);
+                dropPixel();
+                encoderDrive(DRIVE_SPEED, 5, 5, 5, 5, 10.0); // back up to drop the pixel
+            }
 
-                else if (location == 3){
-                    slide(-direction, 12);
-                    encoderDrive(DRIVE_SPEED, -5, -5, -5, -5, 10.0); // back up to drop the pixel
-                    dropPixel();
-                    slide(-direction, 4);
-                    encoderDrive(DRIVE_SPEED, 10, 10, 10, 10, 10.0); // back up to drop the pixel
-                }
+            else if (location == 3){
+                slide(-direction, 12);
+                encoderDrive(DRIVE_SPEED, -5, -5, -5, -5, 10.0); // back up to drop the pixel
+                dropPixel();
+                slide(-direction, 4);
+                encoderDrive(DRIVE_SPEED, 10, 10, 10, 10, 10.0); // back up to drop the pixel
+            }
 
-                else if (location == 1){
-                    slide (-direction, 25);
-                    encoderDrive(DRIVE_SPEED, -9, -9, -9, -9, 10.0); // back up to drop the pixel
-                    turn(direction,10);
-                    encoderDrive(DRIVE_SPEED, -6, -6, -6, -6, 10.0); // back up to drop the pixel
-                    dropPixel();
-                    encoderDrive(DRIVE_SPEED, 6, 6, 6, 6, 10.0); // back up to drop the pixel
-                    turn (-direction,10);
-                    encoderDrive(DRIVE_SPEED, 14, 14, 14, 14, 10.0); // back up to drop the pixel
-                }
+            else if (location == 1){
+                slide (-direction, 25);
+                encoderDrive(DRIVE_SPEED, -9, -9, -9, -9, 10.0); // back up to drop the pixel
+                turn(direction,10);
+                encoderDrive(DRIVE_SPEED, -6, -6, -6, -6, 10.0); // back up to drop the pixel
+                dropPixel();
+                encoderDrive(DRIVE_SPEED, 6, 6, 6, 6, 10.0); // back up to drop the pixel
+                turn (-direction,10);
+                encoderDrive(DRIVE_SPEED, 14, 14, 14, 14, 10.0); // back up to drop the pixel
+            }
 
-                else{ // identify failed, can circle back to gain some basic points
-
-                }
-
-                // turn 90 degress angles before moving through the bar
-                if (isBlue()){
-                    turnLeft90();
-                }
-                else {
-                    turnRight90();
-                }
-                // if far, drive to the position where close one ends
-                if (isFar()){
-                    encoderDrive(DRIVE_SPEED, 90, 90, 90, 90, 10.0); // back up to drop the pixel
-                }
-                else{
-                    encoderDrive(DRIVE_SPEED, 40, 40, 40, 40, 10.0); // back up to drop the pixel
-                    slide(-direction,40);
-                    encoderDrive(DRIVE_SPEED, 15, 15, 15, 15, 10.0); // back up to drop the pixel
-                }
-
-                // turn to face the board
-
-
-                // Save CPU resources; can resume streaming when needed.
-                if (gamepad1.dpad_down) {
-                    visionPortal.stopStreaming();
-                } else if (gamepad1.dpad_up) {
-                    visionPortal.resumeStreaming();
-                }
-
-                // Share the CPU.
-
-                sleep(20);
-
+            else{ // identify failed, can circle back to gain some basic points
 
             }
+
+            // turn 90 degress angles before moving through the bar
+            if (isBlue()){
+                turnLeft90();
+            }
+            else {
+                turnRight90();
+            }
+            // if far, drive to the position where close one ends
+            if (isFar()){
+                encoderDrive(DRIVE_SPEED, 90, 90, 90, 90, 10.0); // back up to drop the pixel
+            }
+            else{
+                encoderDrive(DRIVE_SPEED, 40, 40, 40, 40, 10.0); // back up to drop the pixel
+                slide(-direction,40);
+                encoderDrive(DRIVE_SPEED, 15, 15, 15, 15, 10.0); // back up to drop the pixel
+            }
+
+            // turn to face the board
+
+
+            // Save CPU resources; can resume streaming when needed.
+            if (gamepad1.dpad_down) {
+                visionPortal.stopStreaming();
+            } else if (gamepad1.dpad_up) {
+                visionPortal.resumeStreaming();
+            }
+
+            // Share the CPU.
+
+            sleep(20);
         }
 
         // Save more CPU resources when camera is no longer needed.
