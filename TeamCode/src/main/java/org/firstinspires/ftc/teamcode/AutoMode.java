@@ -242,7 +242,7 @@ public abstract class AutoMode extends RobotParent {
         }
         else {
             if (isRed()){
-                slide(-direction,3);
+                slide(direction,3);
             }
             turn (direction, 4.725);         //move to the right a bit to identify prop on the right position
              trys = 1;
@@ -264,7 +264,7 @@ public abstract class AutoMode extends RobotParent {
                 turn(-direction,4.725);
             }
             if (isRed()){
-                slide(direction,3);
+                slide(-direction,3);
             }
         }
         return location;
