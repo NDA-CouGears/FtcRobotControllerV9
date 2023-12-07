@@ -296,7 +296,12 @@ public abstract class AutoMode extends RobotParent {
     }
     // drop pixel at the line
     private void dropPixel(){
-        openLeftClaw();
+        if(isRed()){
+            openRightClaw();
+        }
+        else{
+            openLeftClaw();
+        }
     }
 
     protected void turnLeft90(){
