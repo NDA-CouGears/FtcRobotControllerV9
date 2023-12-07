@@ -18,7 +18,7 @@ public class RedPropFar extends AutoMode {
 
     @Override
     protected boolean isBlue(){
-        return true;
+        return false;
     }
 
     @Override
