@@ -134,7 +134,12 @@ public abstract class AutoMode extends RobotParent {
                 }
                 // if far, drive to the position where close one ends
                 if (isFar()){
+                    encoderDrive(DRIVE_SPEED, 90, 90, 90, 90, 10.0); // back up to drop the pixel
+                }
+                else{
                     encoderDrive(DRIVE_SPEED, 40, 40, 40, 40, 10.0); // back up to drop the pixel
+                    slide(-direction,40);
+                    encoderDrive(DRIVE_SPEED, 15, 15, 15, 15, 10.0); // back up to drop the pixel
                 }
 
                 // turn to face the board
