@@ -92,67 +92,52 @@ public abstract class AutoMode extends RobotParent {
                 telemetry.addData("Position x: ", location);
                 // move to the prep pos before drop off the pixel
                 slide(direction, 25);
-                encoderDrive(DRIVE_SPEED, 38, 38, 38, 38, 20.0);
+                encoderDrive(DRIVE_SPEED, 35, 35, 35, 35, 20.0);
 
                 // different scenerio
 
                 if (location == 2){
-                    slide (-direction, 14);
-                    encoderDrive(DRIVE_SPEED, 7, 7, 7, 7, 10.0); // back up to drop the pixel
+                    slide (-direction, 16);
                     dropPixel();
+                    encoderDrive(DRIVE_SPEED, 5, 5, 5, 5, 10.0); // back up to drop the pixel
                 }
 
                 else if (location == 3){
-                    slide(-direction, 10);
-                    encoderDrive(DRIVE_SPEED, -4, -4, -4, -4, 10.0); // back up to drop the pixel
+                    slide(-direction, 12);
+                    encoderDrive(DRIVE_SPEED, -5, -5, -5, -5, 10.0); // back up to drop the pixel
                     dropPixel();
-                    encoderDrive(DRIVE_SPEED, 11, 11, 11, 11, 10.0); // back up to drop the pixel
                     slide(-direction, 4);
+                    encoderDrive(DRIVE_SPEED, 10, 10, 10, 10, 10.0); // back up to drop the pixel
                 }
 
                 else if (location == 1){
                     slide (-direction, 25);
                     encoderDrive(DRIVE_SPEED, -9, -9, -9, -9, 10.0); // back up to drop the pixel
-                    turn(direction,9);
+                    turn(direction,10);
+                    encoderDrive(DRIVE_SPEED, -6, -6, -6, -6, 10.0); // back up to drop the pixel
                     dropPixel();
-                    //turn (-direction,9);
-                    encoderDrive(DRIVE_SPEED, 9, 9, 9, 9, 10.0); // back up to drop the pixel
+                    encoderDrive(DRIVE_SPEED, 6, 6, 6, 6, 10.0); // back up to drop the pixel
+                    turn (-direction,10);
+                    encoderDrive(DRIVE_SPEED, 14, 14, 14, 14, 10.0); // back up to drop the pixel
                 }
 
                 else{ // identify failed, can circle back to gain some basic points
 
                 }
 
+                // turn 90 degress angles before moving through the bar
+                if (isBlue()){
+                    turnLeft90();
+                }
+                else {
+                    turnRight90();
+                }
                 // if far, drive to the position where close one ends
                 if (isFar()){
-                    slide(-direction,40);
+                    encoderDrive(DRIVE_SPEED, 40, 40, 40, 40, 10.0); // back up to drop the pixel
                 }
 
                 // turn to face the board
-                if (isBlue()) {
-                    turnLeft90();
-                    if (location == 1){
-                        slide(-direction, 40);
-                    }
-                    else if(location == 2){
-                        slide(-direction, 30);
-                    }
-                    else{
-                        slide(-direction,20);
-                    }
-                }
-                else{
-                    turnRight90();
-                    if (location == 1){
-                        slide(direction, 40);
-                    }
-                    else if(location == 2){
-                        slide(direction, 30);
-                    }
-                    else{
-                        slide(direction,20);
-                    }
-                }
 
 
                 // Save CPU resources; can resume streaming when needed.
@@ -241,13 +226,14 @@ public abstract class AutoMode extends RobotParent {
         sleep(100);
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         int trys = 1;
-        while (currentRecognitions.size() == 0 && trys < 10) {
+        while (currentRecognitions.size() == 0 && trys < 15) {
             telemetry.addData("First recognization failed, try times", trys);
             telemetry.update();
             sleep(100);
             currentRecognitions = tfod.getRecognitions();
             trys++;
         }
+
         if (currentRecognitions.size() == 1) { // if team prop is recognized at straight position
             location = 2;
             telemetry.addData("Position method recognized: ", location);
@@ -255,13 +241,19 @@ public abstract class AutoMode extends RobotParent {
 //            slide(direction,10);
         }
         else {
-            turn (direction, 5);         //move to the right a bit to identify prop on the right position
-            sleep (100);
-            currentRecognitions = tfod.getRecognitions();
+            turn (direction, 4.725);         //move to the right a bit to identify prop on the right position
+             trys = 1;
+            while (currentRecognitions.size() == 0 && trys < 15) {
+                telemetry.addData("Second recognization failed, try times", trys);
+                telemetry.update();
+                sleep(100);
+                currentRecognitions = tfod.getRecognitions();
+                trys++;
+            }
             if (currentRecognitions.size() == 1) { // if team prop is recognized at right position
                 location = 3;
                 telemetry.addData("Position method recognized: ", location);
-                turn (-direction,5);
+                turn (-direction,4.725);
             }
             else{
                 location = 1;
@@ -284,23 +276,22 @@ public abstract class AutoMode extends RobotParent {
 
     private void turn (int direction, double degrees){
         if (direction == 1) { // turn right in a cerntain degrees
-            encoderDrive(DRIVE_SPEED, degrees, degrees, -degrees, -degrees, 10.0);
+            encoderDrive(DRIVE_SPEED, degrees, -degrees, degrees, -degrees, 10.0);
         }
 
         if (direction == -1) { // turn right in a cerntain degrees
-            encoderDrive(DRIVE_SPEED, -degrees, -degrees, degrees, degrees, 10.0);
+            encoderDrive(DRIVE_SPEED, -degrees, degrees, -degrees, degrees, 10.0);
         }
     }
     // drop pixel at the line
     private void dropPixel(){
         openLeftClaw();
-        openRightClaw();
     }
 
     protected void turnLeft90(){
-        encoderDrive(DRIVE_SPEED,   -26, 26, -26, 26,4.0);
+        encoderDrive(DRIVE_SPEED,   -17, 17, -17, 17,4.0);
     }
     protected void turnRight90(){
-        encoderDrive(DRIVE_SPEED,   26, -26, 26, -26,4.0);
+        encoderDrive(DRIVE_SPEED,   17, -17, 17, -17,4.0);
     }
 }   // end class
