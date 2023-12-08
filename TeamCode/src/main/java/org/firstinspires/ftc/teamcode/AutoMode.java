@@ -132,7 +132,7 @@ public abstract class AutoMode extends RobotParent {
             }
             // if far, drive to the position where close one ends
             if (isFar()){
-                encoderDrive(DRIVE_SPEED, 90, 90, 90, 90, 10.0); // back up to drop the pixel
+                encoderDrive(DRIVE_SPEED, 95, 95, 95, 95, 10.0); // back up to drop the pixel
             }
             else{
                 encoderDrive(DRIVE_SPEED, 40, 40, 40, 40, 10.0); // back up to drop the pixel
@@ -300,9 +300,9 @@ public abstract class AutoMode extends RobotParent {
     }
 
     protected void turnLeft90(){
-        encoderDrive(DRIVE_SPEED,   -17, 17, -17, 17,4.0);
+        encoderDrive(DRIVE_SPEED,   -19, 19, -19, 19,4.0);
     }
     protected void turnRight90(){
-        encoderDrive(DRIVE_SPEED,   17, -17, 17, -17,4.0);
+        encoderDrive(DRIVE_SPEED,   19, -19, 19, -19,4.0);
     }
 }   // end class
