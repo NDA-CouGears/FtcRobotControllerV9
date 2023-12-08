@@ -128,6 +128,8 @@ public abstract class AutoMode extends RobotParent {
                 turnLeft90();
             }
             else {
+                // safety margin to clear bar
+                encoderDrive(DRIVE_SPEED, 2, 2, 2, 2, 10.0); // back up to drop the pixel
                 turnRight90();
             }
             // if far, drive to the position where close one ends
@@ -136,21 +138,12 @@ public abstract class AutoMode extends RobotParent {
             }
             else{
                 encoderDrive(DRIVE_SPEED, 40, 40, 40, 40, 10.0); // back up to drop the pixel
-                slide(-direction,40);
-                encoderDrive(DRIVE_SPEED, 15, 15, 15, 15, 10.0); // back up to drop the pixel
+                // Running off into other team backstage and driving into board
+                //slide(-direction,40);
+                //encoderDrive(DRIVE_SPEED, 15, 15, 15, 15, 10.0); // back up to drop the pixel
             }
 
             // turn to face the board
-
-
-            // Save CPU resources; can resume streaming when needed.
-            if (gamepad1.dpad_down) {
-                visionPortal.stopStreaming();
-            } else if (gamepad1.dpad_up) {
-                visionPortal.resumeStreaming();
-            }
-
-            // Share the CPU.
 
             sleep(20);
         }
@@ -303,6 +296,6 @@ public abstract class AutoMode extends RobotParent {
         encoderDrive(DRIVE_SPEED,   -19, 19, -19, 19,4.0);
     }
     protected void turnRight90(){
-        encoderDrive(DRIVE_SPEED,   19, -19, 19, -19,4.0);
+        encoderDrive(DRIVE_SPEED,   17.5, -17.5, 17.5, -17.5,4.0);
     }
 }   // end class

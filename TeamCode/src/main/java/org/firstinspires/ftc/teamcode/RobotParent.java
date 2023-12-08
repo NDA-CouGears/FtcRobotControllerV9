@@ -257,9 +257,9 @@ abstract public class RobotParent extends LinearOpMode {
         if(gamepad1.x && gamepad1.b){
             launchDrone();
         }
-//        if(gamepad2.x){
-//            resetDrone();
-//        }
+        if(gamepad1.a){
+            resetDrone();
+        }
     }
     protected void ArmAndWrist() {
 
@@ -275,15 +275,25 @@ abstract public class RobotParent extends LinearOpMode {
         armMotor.setPower(armPower);
 
         double wristPos = 0;
-        if (armPos < armPosBoardTop) {
-            double wristAdjust = armPos/armPosBoardTop;
-            wristPos = wristServoFloor + (wristServoBoardTop-wristServoFloor) * wristAdjust;
-            wristServo.setPosition(wristPos);
+        if (armPos > 5000) {
+            if (armPos < armPosBoardTop) {
+                double wristAdjust = armPos/armPosBoardTop;
+                wristPos = wristServoFloor + (wristServoBoardTop-wristServoFloor) * wristAdjust;
+                wristServo.setPosition(wristPos);
+            }
+            else if (armPos >= armPosBoardTop && armPos < armPosBoardBottom) {
+                double wristAdjust = (armPos-armPosBoardTop)/(armPosBoardBottom-armPosBoardTop);
+                wristPos = wristServoBoardTop + (wristServoBoardBottom-wristServoBoardTop) * wristAdjust;
+                wristServo.setPosition(wristPos);
+            }
         }
-        else if (armPos >= armPosBoardTop && armPos < armPosBoardBottom) {
-            double wristAdjust = (armPos-armPosBoardTop)/(armPosBoardBottom-armPosBoardTop);
-            wristPos = wristServoBoardTop + (wristServoBoardBottom-wristServoBoardTop) * wristAdjust;
-            wristServo.setPosition(wristPos);
+        else {
+            if (gamepad2.dpad_down) {
+                wristServo.setPosition(wristServo.getPosition()+.01);
+            }
+            if (gamepad2.dpad_up) {
+                wristServo.setPosition(wristServo.getPosition()-.01);
+            }
         }
 
 //        if(gamepad2.y){
