@@ -64,7 +64,7 @@ abstract public class RobotParent extends LinearOpMode {
     static final double clawRightServoOpen = 0.785;
     static final double clawRightServoClosed = 0.278;
     static final double wristServoFloor = 0.38667;
-    static final double wristServoBoardTop = 0.940;
+    static final double wristServoBoardTop = 1.0;
     static final double wristServoBoardBottom = 0.709;
     static final double armPosFloor = 5000;
     static final double armPosBoardTop = 14410;
