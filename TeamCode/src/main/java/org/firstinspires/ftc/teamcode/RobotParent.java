@@ -149,9 +149,9 @@ abstract public class RobotParent extends LinearOpMode {
     }
 
     protected void mecanumDrive() {
-        double y = gamepad1.left_stick_y; // Remember, this is reversed!
-        double x = gamepad1.left_stick_x * -1.1; // Counteract imperfect strafing
-        double rx = gamepad1.right_stick_x * -1;
+        double y = signPreserveSquare(gamepad1.left_stick_y); // Remember, this is reversed!
+        double x = signPreserveSquare(gamepad1.left_stick_x * -1.1); // Counteract imperfect strafing
+        double rx = signPreserveSquare(gamepad1.right_stick_x * -1);
 
         // Denominator is the largest motor power (absolute value) or 1
         // This ensures all the powers maintain the same ratio, but only when
@@ -202,17 +202,27 @@ abstract public class RobotParent extends LinearOpMode {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         winchMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         winchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 
+    private double signPreserveSquare(double value) {
+        wristServo.getController();
+        if (value > 0) {
+            return value * value;
+        }
+        else {
+            return -(value * value);
+        }
+    }
+
     protected void winch() {
-        double winchPower = gamepad2.right_stick_y;
+        double winchPower = signPreserveSquare(gamepad2.right_stick_y);
         winchPower = Range.clip(winchPower, -1.0, 1.0);
         winchMotor.setPower(winchPower);
         if (gamepad2.b){
@@ -263,7 +273,7 @@ abstract public class RobotParent extends LinearOpMode {
     }
     protected void ArmAndWrist() {
 
-        double armPower = -gamepad2.left_stick_y;
+        double armPower = signPreserveSquare(-gamepad2.left_stick_y);
         double armPos = armMotor.getCurrentPosition();
         armPower = Range.clip(armPower, -1.0, 1.0);
         if (!touchSensor.isPressed()) {
@@ -347,7 +357,7 @@ abstract public class RobotParent extends LinearOpMode {
         double servoDelta = 0.005;
 
         double armPosit = armMotor.getCurrentPosition(); //gamepad1.left_stick_y
-        double armPow = gamepad1.left_stick_y;
+        double armPow = signPreserveSquare(gamepad1.left_stick_y);
         armPow = Range.clip(armPow, -1.0, 1.0);
         if (!touchSensor.isPressed()) {
             armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -358,16 +368,16 @@ abstract public class RobotParent extends LinearOpMode {
         armMotor.setPower(armPow);
 
         double winchPosit = winchMotor.getCurrentPosition(); //gamepad2.right_stick_y
-        double winchPow = gamepad2.right_stick_y;
+        double winchPow = signPreserveSquare(gamepad2.right_stick_y);
         winchPow = Range.clip(winchPow, -1.0, 1.0);
         winchMotor.setPower(winchPow);
 
         double leftClawPosit = clawLeftServo.getPosition(); //gamepad1.left_stick_x
-        leftClawPosit = leftClawPosit + (gamepad1.left_stick_x*servoDelta);
+        leftClawPosit = leftClawPosit + (signPreserveSquare(gamepad1.left_stick_x)*servoDelta);
         clawLeftServo.setPosition(leftClawPosit);
 
         double rightClawPosit = clawRightServo.getPosition(); //gamepad1.right_stick_x
-        rightClawPosit = rightClawPosit + (gamepad1.right_stick_x*servoDelta);
+        rightClawPosit = rightClawPosit + (signPreserveSquare(gamepad1.right_stick_x)*servoDelta);
         clawRightServo.setPosition(rightClawPosit);
 
         double wristPosit = wristServo.getPosition(); //gamepad1.dpad

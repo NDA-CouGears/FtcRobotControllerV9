@@ -50,7 +50,7 @@ public abstract class AutoMode extends RobotParent {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private static final String TFOD_MODEL_FILE ="file:///android_asset/quuen1.tflite" ;
-    private static int direction = 1; // set default direction to right for sliding
+    private int direction = 1; // set default direction to right for sliding
 
 
     /**
@@ -293,7 +293,7 @@ public abstract class AutoMode extends RobotParent {
     }
 
     protected void turnLeft90(){
-        encoderDrive(DRIVE_SPEED,   -19, 19, -19, 19,4.0);
+        encoderDrive(DRIVE_SPEED,   -18, 18, -18, 18,4.0);
     }
     protected void turnRight90(){
         encoderDrive(DRIVE_SPEED,   17.5, -17.5, 17.5, -17.5,4.0);
