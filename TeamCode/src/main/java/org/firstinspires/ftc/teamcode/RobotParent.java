@@ -61,10 +61,10 @@ abstract public class RobotParent extends LinearOpMode {
     static final double clawLeftServoClosed = 0.99;
     static final double clawRightServoOpen = 0.785;
     static final double clawRightServoClosed = 0.278;
-    static final double wristServoFloor = 0.216;
+    static final double wristServoFloor = 0.38667;
     static final double wristServoBoardTop = 0.940;
     static final double wristServoBoardBottom = 0.709;
-    static final double armPosFloor = 1000;
+    static final double armPosFloor = 5000;
     static final double armPosBoardTop = 14410;
     static final double armPosBoardBottom = 17194;
     static final double droneServoLocked = 1;
@@ -285,9 +285,9 @@ abstract public class RobotParent extends LinearOpMode {
         armMotor.setPower(armPower);
 
         double wristPos = 0;
-        if (armPos > 5000) {
+        if (armPos > armPosFloor) {
             if (armPos < armPosBoardTop) {
-                double wristAdjust = armPos/armPosBoardTop;
+                double wristAdjust = (armPos-armPosFloor)/(armPosBoardTop-armPosFloor);
                 wristPos = wristServoFloor + (wristServoBoardTop-wristServoFloor) * wristAdjust;
                 wristServo.setPosition(wristPos);
             }
