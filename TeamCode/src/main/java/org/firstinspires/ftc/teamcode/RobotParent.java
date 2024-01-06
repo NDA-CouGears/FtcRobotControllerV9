@@ -9,6 +9,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.os.Environment;
 
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -18,6 +19,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import java.io.FileOutputStream;
+import java.util.List;
 import java.util.Properties;
 
 
@@ -209,6 +211,12 @@ abstract public class RobotParent extends LinearOpMode {
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         winchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+
+        // Turns off the blinking LED
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setConstant(0);
+        }
     }
 
     private double signPreserveSquare(double value) {
