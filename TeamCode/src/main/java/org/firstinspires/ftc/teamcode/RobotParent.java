@@ -84,6 +84,7 @@ abstract public class RobotParent extends LinearOpMode {
         int newLeftBackTarget;
         int newRightFrontTarget;
         int newRightBackTarget;
+        speed = 0.5;
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {

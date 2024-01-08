@@ -74,8 +74,8 @@ public abstract class AutoMode extends RobotParent {
         telemetry.addData(">", "Touch Play to start OpMode");
         telemetry.update();
         waitForStart();
-        this.closeLeftClaw();
-        this.closeRightClaw();
+        closeLeftClaw();
+        closeRightClaw();
 
         if (opModeIsActive()) {
             telemetryTfod();
@@ -104,21 +104,22 @@ public abstract class AutoMode extends RobotParent {
 
             else if (location == 3){
                 slide(-direction, 12);
-                encoderDrive(DRIVE_SPEED, -5, -5, -5, -5, 10.0); // back up to drop the pixel
+                encoderDrive(DRIVE_SPEED, -3, -3, -3, -3, 10.0); // back up to drop the pixel
                 dropPixel();
+                sleep(100);
                 slide(-direction, 4);
-                encoderDrive(DRIVE_SPEED, 10, 10, 10, 10, 10.0); // back up to drop the pixel
+                encoderDrive(DRIVE_SPEED, 8, 8, 8, 8, 10.0); // back up to drop the pixel
             }
 
             else if (location == 1){
                 slide (-direction, 25);
-                encoderDrive(DRIVE_SPEED, -9, -9, -9, -9, 10.0); // back up to drop the pixel
+                encoderDrive(DRIVE_SPEED, -12, -12, -12, -12, 10.0); // back up to drop the pixel
                 turn(direction,10);
                 encoderDrive(DRIVE_SPEED, -6, -6, -6, -6, 10.0); // back up to drop the pixel
                 dropPixel();
                 encoderDrive(DRIVE_SPEED, 6, 6, 6, 6, 10.0); // back up to drop the pixel
                 turn (-direction,10);
-                encoderDrive(DRIVE_SPEED, 14, 14, 14, 14, 10.0); // back up to drop the pixel
+                encoderDrive(DRIVE_SPEED, 17, 17, 17, 17, 10.0); // back up to drop the pixel
             }
 
             else{ // identify failed, can circle back to gain some basic points
