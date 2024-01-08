@@ -74,6 +74,8 @@ public abstract class AutoMode extends RobotParent {
         telemetry.addData(">", "Touch Play to start OpMode");
         telemetry.update();
         waitForStart();
+        this.closeLeftClaw();
+        this.closeRightClaw();
 
         if (opModeIsActive()) {
             telemetryTfod();
