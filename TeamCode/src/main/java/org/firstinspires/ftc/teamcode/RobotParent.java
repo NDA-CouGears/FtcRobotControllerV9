@@ -151,6 +151,54 @@ abstract public class RobotParent extends LinearOpMode {
         }
     }
 
+    protected void encoderArmDrive(double speed,
+                                double armPos,
+                                double timeoutS) {
+
+        speed = 0.5;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+            // Determine new target position, and pass to motor controller
+            armMotor.setTargetPosition((int)armPos);
+
+            // Turn On RUN_TO_POSITION
+            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            telemetry.addData("Currently at", " at %7f :%7f",
+                    armMotor.getCurrentPosition());
+            telemetry.update();
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            armMotor.setPower(Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) && touchSensor.isPressed() && armMotor.isBusy()) {
+
+                // Display it for the driver.
+                telemetry.addData("Running to", " %7f", armPos);
+                telemetry.addData("Currently at", " at %7d", armMotor.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            armMotor.setPower(0);
+
+
+            telemetry.addData("Moved to", " %7f :%7f", armPos);
+            telemetry.update();
+
+            // Turn off RUN_TO_POSITION
+            armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+    }
     protected void mecanumDrive() {
         double y = signPreserveSquare(gamepad1.left_stick_y); // Remember, this is reversed!
         double x = signPreserveSquare(gamepad1.left_stick_x * -1.1); // Counteract imperfect strafing
@@ -270,6 +318,15 @@ abstract public class RobotParent extends LinearOpMode {
     }
     protected void closeRightClaw(){
         clawRightServo.setPosition(clawRightServoClosed);
+    }
+
+    protected void moveArmUp(){
+        wristServo.setPosition(wristServoBoardTop);
+        encoderArmDrive(0.5, armPosBoardTop-2000, 20);
+    }
+    protected void moveArmDown(){
+        wristServo.setPosition(wristServoFloor);
+        encoderArmDrive(0.5, armPosFloor, 20);
     }
 
     protected void drone(){

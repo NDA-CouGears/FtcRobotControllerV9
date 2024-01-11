@@ -137,15 +137,17 @@ public abstract class AutoMode extends RobotParent {
             }
             // if far, drive to the position where close one ends
             if (isFar()){
-                encoderDrive(DRIVE_SPEED, 95, 95, 95, 95, 10.0); // back up to drop the pixel
+                encoderDrive(DRIVE_SPEED, 92, 92, 92, 92, 10.0); // back up to drop the pixel
             }
             else{
-                encoderDrive(DRIVE_SPEED, 40, 40, 40, 40, 10.0); // back up to drop the pixel
+                encoderDrive(DRIVE_SPEED, 28, 28, 28, 28, 10.0); // back up to drop the pixel
                 // Running off into other team backstage and driving into board
                 //slide(-direction,40);
                 //encoderDrive(DRIVE_SPEED, 15, 15, 15, 15, 10.0); // back up to drop the pixel
             }
-
+            if(isNear()){
+                backDrop();
+            }
             // turn to face the board
 
             sleep(20);
@@ -237,7 +239,7 @@ public abstract class AutoMode extends RobotParent {
 //            slide(direction,10);
         }
         else {
-            if (isRed()){
+            if ((isBlue() && isNear()) || (isRed() && isFar())){
                 slide(direction,3);
             }
             turn (direction, 4.725);         //move to the right a bit to identify prop on the right position
@@ -259,7 +261,7 @@ public abstract class AutoMode extends RobotParent {
                 telemetry.addData("Position method recognized: ", location);
                 turn(-direction,4.725);
             }
-            if (isRed()){
+            if ((isBlue() && isNear()) || (isRed() && isFar())){
                 slide(-direction,3);
             }
         }
@@ -287,14 +289,22 @@ public abstract class AutoMode extends RobotParent {
     }
     // drop pixel at the line
     private void dropPixel(){
-        if(isRed()){
+        if((isRed()&&isFar()) || (isBlue() && isNear()) ){
             openRightClaw();
         }
         else{
             openLeftClaw();
         }
     }
-
+    protected void backDrop(){
+        closeRightClaw();
+        closeLeftClaw();
+        slide(direction,30);
+        moveArmUp();
+        openRightClaw();
+        openLeftClaw();
+        moveArmDown();
+    }
     protected void turnLeft90(){
         encoderDrive(DRIVE_SPEED,   -18, 18, -18, 18,4.0);
     }
