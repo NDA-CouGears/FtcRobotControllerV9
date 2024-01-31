@@ -84,7 +84,7 @@ abstract public class RobotParent extends LinearOpMode {
         int newLeftBackTarget;
         int newRightFrontTarget;
         int newRightBackTarget;
-        speed = 0.5;
+        speed = 0.25;
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
@@ -237,10 +237,10 @@ abstract public class RobotParent extends LinearOpMode {
         winchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
         // setting direction for motors
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         armMotor.setDirection(DcMotor.Direction.FORWARD);
         winchMotor.setDirection(DcMotor.Direction.FORWARD);
 
