@@ -165,7 +165,7 @@ abstract public class RobotParent extends LinearOpMode {
             // Turn On RUN_TO_POSITION
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            telemetry.addData("Currently at", " at %7f :%7f",
+            telemetry.addData("Currently at", " at %7d",
                     armMotor.getCurrentPosition());
             telemetry.update();
 
@@ -192,7 +192,7 @@ abstract public class RobotParent extends LinearOpMode {
             armMotor.setPower(0);
 
 
-            telemetry.addData("Moved to", " %7f :%7f", armPos);
+            telemetry.addData("Moved to", " %7f", armPos);
             telemetry.update();
 
             // Turn off RUN_TO_POSITION
@@ -322,11 +322,11 @@ abstract public class RobotParent extends LinearOpMode {
 
     protected void moveArmUp(){
         wristServo.setPosition(wristServoBoardTop);
-        encoderArmDrive(0.5, armPosBoardTop-2000, 20);
+        encoderArmDrive(1.0, armPosBoardTop-2150, 20);
     }
     protected void moveArmDown(){
         wristServo.setPosition(wristServoFloor);
-        encoderArmDrive(0.5, armPosFloor, 20);
+        encoderArmDrive(1.0, armPosFloor, 20);
     }
 
     protected void drone(){

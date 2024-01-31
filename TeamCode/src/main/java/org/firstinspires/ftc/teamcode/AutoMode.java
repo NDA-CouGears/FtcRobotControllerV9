@@ -98,14 +98,28 @@ public abstract class AutoMode extends RobotParent {
 
             if (location == 2){
                 slide (-direction, 16);
+                if(isRed()&&isNear()){
+                    slide(-direction,4);
+                }
+                if(isBlue()&&isNear()){
+                    encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 10.0); // back up to drop the pixel
+                }
                 dropPixel();
+                if(isRed()&&isNear()){
+                    slide(direction,4);
+                }
                 encoderDrive(DRIVE_SPEED, 5, 5, 5, 5, 10.0); // back up to drop the pixel
             }
 
             else if (location == 3){
                 slide(-direction, 12);
+                if(isRed()&&isNear())
+                {
+                    slide(-direction,2);
+                }
                 encoderDrive(DRIVE_SPEED, -3, -3, -3, -3, 10.0); // back up to drop the pixel
                 dropPixel();
+
                 sleep(100);
                 slide(-direction, 4);
                 encoderDrive(DRIVE_SPEED, 8, 8, 8, 8, 10.0); // back up to drop the pixel
@@ -119,7 +133,8 @@ public abstract class AutoMode extends RobotParent {
                 dropPixel();
                 encoderDrive(DRIVE_SPEED, 6, 6, 6, 6, 10.0); // back up to drop the pixel
                 turn (-direction,10);
-                encoderDrive(DRIVE_SPEED, 17, 17, 17, 17, 10.0); // back up to drop the pixel
+                encoderDrive(DRIVE_SPEED, 19, 19, 19, 19, 10.0); // back up to drop the pixel
+                slide(direction,5);
             }
 
             else{ // identify failed, can circle back to gain some basic points
@@ -140,7 +155,7 @@ public abstract class AutoMode extends RobotParent {
                 encoderDrive(DRIVE_SPEED, 92, 92, 92, 92, 10.0); // back up to drop the pixel
             }
             else{
-                encoderDrive(DRIVE_SPEED, 28, 28, 28, 28, 10.0); // back up to drop the pixel
+                encoderDrive(DRIVE_SPEED, 27, 27, 27, 27, 10.0); // back up to drop the pixel
                 // Running off into other team backstage and driving into board
                 //slide(-direction,40);
                 //encoderDrive(DRIVE_SPEED, 15, 15, 15, 15, 10.0); // back up to drop the pixel
@@ -299,10 +314,19 @@ public abstract class AutoMode extends RobotParent {
     protected void backDrop(){
         closeRightClaw();
         closeLeftClaw();
-        slide(direction,30);
+        if (isRed()){
+            slide(direction,28);
+        }
+        else{
+            slide(direction,29);
+        }
         moveArmUp();
+//        encoderDrive(DRIVE_SPEED,   1, 1, 1, 1,4.0);
         openRightClaw();
         openLeftClaw();
+        sleep(500);
+        closeRightClaw();
+        closeLeftClaw();
         moveArmDown();
     }
     protected void turnLeft90(){
