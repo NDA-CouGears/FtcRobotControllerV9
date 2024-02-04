@@ -44,7 +44,7 @@ abstract public class RobotParent extends LinearOpMode {
     static final double TURN_SPEED = 0.5;
     static final double DRIVE_GEAR_REDUCTION = 1.0;
     static final double WHEEL_DIAMETER_MM = 97;
-    static final double COUNTS_PER_MOTOR_REV = 1440;
+    static final double COUNTS_PER_MOTOR_REV = 1440/3;
     static final double COUNTS_PER_MM = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * 3.1415);
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -260,12 +260,14 @@ abstract public class RobotParent extends LinearOpMode {
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         winchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
+/*
         // Turns off the blinking LED
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setConstant(0);
         }
+
+ */
     }
 
     private double signPreserveSquare(double value) {
