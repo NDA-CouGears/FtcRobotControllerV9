@@ -31,9 +31,12 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Size;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 import java.util.List;
 
@@ -51,12 +54,16 @@ public abstract class AutoMode extends RobotParent {
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private static final String TFOD_MODEL_FILE ="file:///android_asset/quuen1.tflite" ;
     private int direction = 1; // set default direction to right for sliding
+    protected int testlocation = 0;
+    protected int propLocation;
 
 
     /**
      * The variable to store our instance of the TensorFlow Object Detection processor.
      */
     private TfodProcessor tfod;
+    private AprilTagProcessor aprilTag;
+
 
     /**
      * The variable to store our instance of the vision portal.
@@ -67,7 +74,7 @@ public abstract class AutoMode extends RobotParent {
     @Override
     public void runOpMode() {
         initHardware();
-        initTfod();
+        initCamera();
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
@@ -79,6 +86,7 @@ public abstract class AutoMode extends RobotParent {
 
         if (opModeIsActive()) {
             telemetryTfod();
+            telemetryAprilTag();
             // Push telemetry to the Driver Station.
             telemetry.update();
 
@@ -89,59 +97,39 @@ public abstract class AutoMode extends RobotParent {
             }
             telemetry.addData("direction: ", direction);
             int location = locateProp(); // identify where is the team prop
+            propLocation = location;
             telemetry.addData("Position x: ", location);
             // move to the prep pos before drop off the pixel
-            slide(direction, 25);
-            encoderDrive(DRIVE_SPEED, 35, 35, 35, 35, 20.0);
+            if (location == 2 || location == 3) {
+                encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 5.0);
+                slide(direction, 22);
+                encoderDrive(DRIVE_SPEED, 37, 37, 37, 37, 20.0);
+                if (location == 2) {
+                    slide(-direction, 18);
+                    dropPixel();
+                } else {
+                    slide(-direction, 11);
+                    dropPixel();
+                    slide(-direction, 7);
+                    sleep(100);
+                }
+                encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 5.0);
+            }
+                if (location == 1){
+                    encoderDrive(DRIVE_SPEED, 15,15,15,15,10.0);
+                    turnRight90();
+                    encoderDrive(DRIVE_SPEED,-5,-5,-5,-5,5.0);
+                    dropPixel();
+                    encoderDrive(DRIVE_SPEED,5,5,5,5,5.0);
+                    slide(-direction,25);
+                }
+
 
             // different scenerio
 
-            if (location == 2){
-                slide (-direction, 16);
-                if(isRed()&&isNear()){
-                    slide(-direction,4);
-                }
-                if(isBlue()&&isNear()){
-                    encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 10.0); // back up to drop the pixel
-                }
-                dropPixel();
-                if(isRed()&&isNear()){
-                    slide(direction,4);
-                }
-                encoderDrive(DRIVE_SPEED, 5, 5, 5, 5, 10.0); // back up to drop the pixel
-            }
 
-            else if (location == 3){
-                slide(-direction, 12);
-                if(isRed()&&isNear())
-                {
-                    slide(-direction,2);
-                }
-                encoderDrive(DRIVE_SPEED, -3, -3, -3, -3, 10.0); // back up to drop the pixel
-                dropPixel();
 
-                sleep(100);
-                slide(-direction, 4);
-                encoderDrive(DRIVE_SPEED, 8, 8, 8, 8, 10.0); // back up to drop the pixel
-            }
-
-            else if (location == 1){
-                slide (-direction, 25);
-                encoderDrive(DRIVE_SPEED, -12, -12, -12, -12, 10.0); // back up to drop the pixel
-                turn(direction,10);
-                encoderDrive(DRIVE_SPEED, -6, -6, -6, -6, 10.0); // back up to drop the pixel
-                dropPixel();
-                encoderDrive(DRIVE_SPEED, 6, 6, 6, 6, 10.0); // back up to drop the pixel
-                turn (-direction,10);
-                encoderDrive(DRIVE_SPEED, 19, 19, 19, 19, 10.0); // back up to drop the pixel
-                slide(direction,5);
-            }
-
-            else{ // identify failed, can circle back to gain some basic points
-
-            }
-
-            // turn 90 degress angles before moving through the bar
+            // turn 90 degres angles before moving through the bar
             if (isBlue()){
                 turnLeft90();
             }
@@ -152,7 +140,12 @@ public abstract class AutoMode extends RobotParent {
             }
             // if far, drive to the position where close one ends
             if (isFar()){
-                encoderDrive(DRIVE_SPEED, 92, 92, 92, 92, 10.0); // back up to drop the pixel
+                if(location == 1){
+                    encoderDrive(DRIVE_SPEED, -80, -80, -80, -80, 10.0); // back up to drop the pixel
+                }
+                else {
+                    encoderDrive(DRIVE_SPEED, 80, 80, 80, 80, 10.0); // back up to drop the pixel
+                }
             }
             else{
                 encoderDrive(DRIVE_SPEED, 27, 27, 27, 27, 10.0); // back up to drop the pixel
@@ -160,11 +153,9 @@ public abstract class AutoMode extends RobotParent {
                 //slide(-direction,40);
                 //encoderDrive(DRIVE_SPEED, 15, 15, 15, 15, 10.0); // back up to drop the pixel
             }
-            if(isNear()){
-                backDrop();
-            }
-            // turn to face the board
 
+            // turn to face the board
+            backDrop(location);
             sleep(20);
         }
 
@@ -184,25 +175,25 @@ public abstract class AutoMode extends RobotParent {
      * Initialize the TensorFlow Object Detection processor.
      */
 
-    private void initTfod() {
+    private void initCamera() {
 
         // Create the TensorFlow processor the easy way.
 //        tfod = TfodProcessor.easyCreateWithDefaults();
 //        String[] labels = {"Red Prop"};
 
         tfod = getProcessor();
+        aprilTag = new AprilTagProcessor.Builder().build();
         // Create the vision portal the easy way.
         // visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam1"), tfod);
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam1"))
                 .addProcessor(tfod)
+                .addProcessor(aprilTag)
                 .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
                 .enableLiveView(true)
                 .setAutoStopLiveView(true)
                 .build();
-
-
 
 
         //
@@ -230,13 +221,67 @@ public abstract class AutoMode extends RobotParent {
         }   // end for() loop
 
     }   // end method telemetryTfod()
+    private void telemetryAprilTag() {
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        telemetry.addData("# AprilTags Detected", currentDetections.size());
+
+        // Step through the list of detections and display info for each one.
+        for (AprilTagDetection detection : currentDetections) {
+            if (detection.metadata != null) {
+                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+            } else {
+                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+            }
+        }   // end for() loop
+
+        // Add "key" information to telemetry
+        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+        telemetry.addLine("RBE = Range, Bearing & Elevation");
+
+    }   // end method telemetryAprilTag()
+
+    private void moveToTag(){
+        boolean atDestination = false;
+        while(!atDestination && opModeIsActive()){
+            AprilTagDetection tagData = getBestTagforLocation();
+            driveTowardTag(tagData);
+        }
+    }
 
 
+    private AprilTagDetection getBestTagforLocation() {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        AprilTagDetection bestMatch = null;
+        for (AprilTagDetection detection : currentDetections) {
+            if (bestMatch == null){
+                bestMatch = detection;
+                continue;
+            }
+            if (Math.abs(bestMatch.id - propLocation) > (Math.abs(detection.id - propLocation))
+            {
+                bestMatch = detection;
+            }
+        }
+        return bestMatch;
+    }
+
+    private void driveTowardTag(AprilTagDetection tagData){
+        if (tagData.ftcPose.yaw<5){
+            turn(-direction, tagData.ftcPose.yaw);
+            return;
+        }
+    }
     private int locateProp() {
         int location = 0;
-
-        encoderDrive(DRIVE_SPEED, 7 , 7, 7, 7, 5.0);
-        sleep(100);
+        if (testlocation > 0){
+            return testlocation;
+        }
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         int trys = 1;
         while (currentRecognitions.size() == 0 && trys < 15) {
@@ -248,47 +293,30 @@ public abstract class AutoMode extends RobotParent {
         }
 
         if (currentRecognitions.size() == 1) { // if team prop is recognized at straight position
-            location = 2;
+            Recognition found = currentRecognitions.get(0);
+            if(found.getLeft() < 320)
+            {
+                location = 2;
+            }
+            else{
+                location = 3;
+            }
             telemetry.addData("Position method recognized: ", location);
 
 //            slide(direction,10);
         }
         else {
-            if ((isBlue() && isNear()) || (isRed() && isFar())){
-                slide(direction,3);
-            }
-            turn (direction, 4.725);         //move to the right a bit to identify prop on the right position
-             trys = 1;
-            while (currentRecognitions.size() == 0 && trys < 15) {
-                telemetry.addData("Second recognization failed, try times", trys);
-                telemetry.update();
-                sleep(100);
-                currentRecognitions = tfod.getRecognitions();
-                trys++;
-            }
-            if (currentRecognitions.size() == 1) { // if team prop is recognized at right position
-                location = 3;
-                telemetry.addData("Position method recognized: ", location);
-                turn (-direction,4.725);
-            }
-            else{
-                location = 1;
-                telemetry.addData("Position method recognized: ", location);
-                turn(-direction,4.725);
-            }
-            if ((isBlue() && isNear()) || (isRed() && isFar())){
-                slide(-direction,3);
-            }
+           location = 1;
         }
         return location;
     }
 
     private void slide (int direction, int inches){
         if (direction == 1){ // slide to right
-            encoderDrive(DRIVE_SPEED, inches , -inches, -inches, inches, 10.0);
+            encoderDrive(0.4, inches , -inches, -inches, inches, 10.0);
         }
         if (direction == -1){ // slide to left
-            encoderDrive(DRIVE_SPEED, -inches , inches, inches, -inches, 10.0);
+            encoderDrive(0.4, -inches , inches, inches, -inches, 10.0);
         }
     }
 
@@ -311,14 +339,24 @@ public abstract class AutoMode extends RobotParent {
             openLeftClaw();
         }
     }
-    protected void backDrop(){
+    protected void backDrop(int location){
         closeRightClaw();
         closeLeftClaw();
-        if (isRed()){
-            slide(direction,28);
+        if ((isBlue() && isFar())||(isRed()&&isNear())){
+            if (location ==2){
+                slide(-direction,30);
+            }
+            if(location == 3){
+                slide (-direction,20);
+            }
         }
         else{
-            slide(direction,29);
+            if (location == 2){
+                slide(direction,30);
+            }
+            if(location == 3){
+                slide (direction,20);
+            }
         }
         moveArmUp();
 //        encoderDrive(DRIVE_SPEED,   1, 1, 1, 1,4.0);
@@ -330,7 +368,7 @@ public abstract class AutoMode extends RobotParent {
         moveArmDown();
     }
     protected void turnLeft90(){
-        encoderDrive(DRIVE_SPEED,   -18, 18, -18, 18,4.0);
+        encoderDrive(DRIVE_SPEED,   -17.5, 17.5, -17.5, 17.5,4.0);
     }
     protected void turnRight90(){
         encoderDrive(DRIVE_SPEED,   17.5, -17.5, 17.5, -17.5,4.0);
