@@ -155,7 +155,9 @@ public abstract class AutoMode extends RobotParent {
             }
 
             // turn to face the board
-           moveToTag();
+            slide(-direction,18);
+            sleep(200);
+            moveToTag();
             sleep(20);
         }
 
@@ -257,7 +259,14 @@ public abstract class AutoMode extends RobotParent {
 
 
     private AprilTagDetection getBestTagforLocation() {
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        List<AprilTagDetection> currentDetections = null;
+        for (int x = 0; x<10; x++){
+            currentDetections = aprilTag.getDetections();
+            if (currentDetections.size()>0){
+                break;
+            }
+        }
+
         AprilTagDetection bestMatch = null;
         for (AprilTagDetection detection : currentDetections) {
             if (bestMatch == null){
