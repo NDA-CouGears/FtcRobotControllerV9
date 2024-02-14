@@ -155,7 +155,7 @@ public abstract class AutoMode extends RobotParent {
             }
 
             // turn to face the board
-            backDrop(location);
+           moveToTag();
             sleep(20);
         }
 
@@ -250,8 +250,9 @@ public abstract class AutoMode extends RobotParent {
         boolean atDestination = false;
         while(!atDestination && opModeIsActive()){
             AprilTagDetection tagData = getBestTagforLocation();
-            driveTowardTag(tagData);
+            atDestination = driveTowardTag(tagData);
         }
+        backDrop();
     }
 
 
@@ -263,7 +264,7 @@ public abstract class AutoMode extends RobotParent {
                 bestMatch = detection;
                 continue;
             }
-            if (Math.abs(bestMatch.id - propLocation) > (Math.abs(detection.id - propLocation))
+            if (Math.abs(bestMatch.id - propLocation) > (Math.abs(detection.id - propLocation)))
             {
                 bestMatch = detection;
             }
@@ -271,11 +272,23 @@ public abstract class AutoMode extends RobotParent {
         return bestMatch;
     }
 
-    private void driveTowardTag(AprilTagDetection tagData){
-        if (tagData.ftcPose.yaw<5){
+    private boolean driveTowardTag(AprilTagDetection tagData){
+        int tagId = isRed()?tagData.id-3 : tagData.id;
+        double tagDistance = (tagId - propLocation)*6;
+        if (tagData.ftcPose.yaw>5){
             turn(-direction, tagData.ftcPose.yaw);
-            return;
+            return false;
         }
+        if (tagData.ftcPose.x>2){
+            slide(-1,(int)(tagDistance-tagData.ftcPose.x));
+            return false;
+        }
+        if(tagData.ftcPose.y<10 && tagData.ftcPose.y>8){
+            return true;
+        }
+        double driveYDistance = tagData.ftcPose.y - 9.0;
+        encoderDrive(0.5, driveYDistance,driveYDistance,driveYDistance,driveYDistance, 5.0);
+        return false;
     }
     private int locateProp() {
         int location = 0;
@@ -339,25 +352,10 @@ public abstract class AutoMode extends RobotParent {
             openLeftClaw();
         }
     }
-    protected void backDrop(int location){
+    protected void backDrop(){
         closeRightClaw();
         closeLeftClaw();
-        if ((isBlue() && isFar())||(isRed()&&isNear())){
-            if (location ==2){
-                slide(-direction,30);
-            }
-            if(location == 3){
-                slide (-direction,20);
-            }
-        }
-        else{
-            if (location == 2){
-                slide(direction,30);
-            }
-            if(location == 3){
-                slide (direction,20);
-            }
-        }
+
         moveArmUp();
 //        encoderDrive(DRIVE_SPEED,   1, 1, 1, 1,4.0);
         openRightClaw();
@@ -374,3 +372,4 @@ public abstract class AutoMode extends RobotParent {
         encoderDrive(DRIVE_SPEED,   17.5, -17.5, 17.5, -17.5,4.0);
     }
 }   // end class
+
