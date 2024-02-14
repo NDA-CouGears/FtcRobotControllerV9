@@ -57,6 +57,7 @@ public abstract class AutoMode extends RobotParent {
     protected int testlocation = 0;
     protected int propLocation;
 
+    protected String debugMsg = "";
 
     /**
      * The variable to store our instance of the TensorFlow Object Detection processor.
@@ -85,6 +86,12 @@ public abstract class AutoMode extends RobotParent {
         closeRightClaw();
 
         if (opModeIsActive()) {
+            propLocation = 1;
+            slide(-direction,35);
+            sleep(200);
+            moveToTag();
+            sleep(20);
+
             telemetryTfod();
             telemetryAprilTag();
             // Push telemetry to the Driver Station.
@@ -155,7 +162,7 @@ public abstract class AutoMode extends RobotParent {
             }
 
             // turn to face the board
-            slide(-direction,18);
+            slide(-direction,35);
             sleep(200);
             moveToTag();
             sleep(20);
@@ -227,6 +234,7 @@ public abstract class AutoMode extends RobotParent {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
+        telemetry.addData("# Debug Message", debugMsg);
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
@@ -253,6 +261,9 @@ public abstract class AutoMode extends RobotParent {
         while(!atDestination && opModeIsActive()){
             AprilTagDetection tagData = getBestTagforLocation();
             atDestination = driveTowardTag(tagData);
+
+            telemetryAprilTag();
+            telemetry.update();
         }
         backDrop();
     }
@@ -261,6 +272,10 @@ public abstract class AutoMode extends RobotParent {
     private AprilTagDetection getBestTagforLocation() {
         List<AprilTagDetection> currentDetections = null;
         for (int x = 0; x<10; x++){
+            debugMsg = "Tries:" + x;
+            telemetryAprilTag();
+            telemetry.update();
+            sleep(100);
             currentDetections = aprilTag.getDetections();
             if (currentDetections.size()>0){
                 break;
@@ -283,13 +298,16 @@ public abstract class AutoMode extends RobotParent {
 
     private boolean driveTowardTag(AprilTagDetection tagData){
         int tagId = isRed()?tagData.id-3 : tagData.id;
-        double tagDistance = (tagId - propLocation)*6;
-        if (tagData.ftcPose.yaw>5){
-            turn(-direction, tagData.ftcPose.yaw);
+        double tagDistance = (tagId - propLocation)*12-tagData.ftcPose.x;
+
+        if (tagData.ftcPose.yaw>5 || tagData.ftcPose.yaw<-5){
+            turn(-direction, tagData.ftcPose.yaw*0.2);
+            debugMsg += "yaw = " + tagData.ftcPose.yaw + ":";
             return false;
         }
-        if (tagData.ftcPose.x>2){
-            slide(-1,(int)(tagDistance-tagData.ftcPose.x));
+        if (tagDistance>2 || tagDistance < -2){
+            debugMsg += "slide = " + tagDistance + ":";
+            slide(-1,(int)(tagDistance));
             return false;
         }
         if(tagData.ftcPose.y<10 && tagData.ftcPose.y>8){
