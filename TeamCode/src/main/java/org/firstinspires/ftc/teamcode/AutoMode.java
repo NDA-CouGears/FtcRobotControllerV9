@@ -298,7 +298,7 @@ public abstract class AutoMode extends RobotParent {
 
     private boolean driveTowardTag(AprilTagDetection tagData){
         int tagId = isRed()?tagData.id-3 : tagData.id;
-        double tagDistance = (tagId - propLocation)*12-tagData.ftcPose.x;
+        double tagDistance = (tagId - propLocation)*8-tagData.ftcPose.x;
 
         if (tagData.ftcPose.yaw>5 || tagData.ftcPose.yaw<-5){
             turn(-direction, tagData.ftcPose.yaw*0.2);
