@@ -324,7 +324,7 @@ abstract public class RobotParent extends LinearOpMode {
 
     protected void moveArmUp(){
         wristServo.setPosition(0.85);
-        encoderArmDrive(1.0, armPosBoardBottom-3000, 20);
+        encoderArmDrive(1.0, armPosBoardBottom-1500, 20);
     }
     protected void moveArmDown(){
         wristServo.setPosition(wristServoFloor);

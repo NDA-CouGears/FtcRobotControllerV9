@@ -86,17 +86,6 @@ public abstract class AutoMode extends RobotParent {
         closeRightClaw();
 
         if (opModeIsActive()) {
-            propLocation = 1;
-            slide(-direction,35);
-            sleep(200);
-            moveToTag();
-            sleep(20);
-
-            telemetryTfod();
-            telemetryAprilTag();
-            // Push telemetry to the Driver Station.
-            telemetry.update();
-
 
             if ((isRed() && isFar()) || (isBlue() && isNear())) //set slide direction to left
             {
@@ -155,15 +144,21 @@ public abstract class AutoMode extends RobotParent {
                 }
             }
             else{
-                encoderDrive(DRIVE_SPEED, 27, 27, 27, 27, 10.0); // back up to drop the pixel
+                encoderDrive(DRIVE_SPEED, 20, 20, 20, 20, 10.0); // back up to drop the pixel
                 // Running off into other team backstage and driving into board
                 //slide(-direction,40);
                 //encoderDrive(DRIVE_SPEED, 15, 15, 15, 15, 10.0); // back up to drop the pixel
             }
 
             // turn to face the board
+            if ((isBlue() && isNear()) || (isRed()) && isFar()){
+                direction = -direction;
+            }
+
             slide(-direction,35);
             sleep(200);
+            closeRightClaw();
+            closeLeftClaw();
             moveToTag();
             sleep(20);
         }
@@ -278,6 +273,7 @@ public abstract class AutoMode extends RobotParent {
             sleep(100);
             currentDetections = aprilTag.getDetections();
             if (currentDetections.size()>0){
+                debugMsg = "current detections size:" + currentDetections.size();
                 break;
             }
         }
@@ -293,27 +289,31 @@ public abstract class AutoMode extends RobotParent {
                 bestMatch = detection;
             }
         }
+        debugMsg = "best match:" + bestMatch.id;
         return bestMatch;
     }
 
     private boolean driveTowardTag(AprilTagDetection tagData){
         int tagId = isRed()?tagData.id-3 : tagData.id;
         double tagDistance = (tagId - propLocation)*8-tagData.ftcPose.x;
+        if((isBlue()&&isNear()) || (isRed()&& isFar())){
+            tagDistance =+4;
+        }
 
         if (tagData.ftcPose.yaw>5 || tagData.ftcPose.yaw<-5){
-            turn(-direction, tagData.ftcPose.yaw*0.2);
+            turn(-1, tagData.ftcPose.yaw*0.2);
             debugMsg += "yaw = " + tagData.ftcPose.yaw + ":";
             return false;
         }
         if (tagDistance>2 || tagDistance < -2){
             debugMsg += "slide = " + tagDistance + ":";
-            slide(-1,(int)(tagDistance));
+            slide(1,(int)(tagDistance));
             return false;
         }
-        if(tagData.ftcPose.y<10 && tagData.ftcPose.y>8){
+        if(tagData.ftcPose.y<13 && tagData.ftcPose.y>11){
             return true;
         }
-        double driveYDistance = tagData.ftcPose.y - 9.0;
+        double driveYDistance = tagData.ftcPose.y - 12;
         encoderDrive(0.5, driveYDistance,driveYDistance,driveYDistance,driveYDistance, 5.0);
         return false;
     }
