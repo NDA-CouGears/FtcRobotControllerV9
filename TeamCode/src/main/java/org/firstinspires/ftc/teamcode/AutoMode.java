@@ -92,13 +92,22 @@ public abstract class AutoMode extends RobotParent {
                 direction = -1;
             }
             telemetry.addData("direction: ", direction);
+            if((isBlue()&&isNear())||(isRed()&&isFar())){
+                encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 5.0);
+                slide(direction,6);
+            }
             int location = locateProp(); // identify where is the team prop
             propLocation = location;
             telemetry.addData("Position x: ", location);
             // move to the prep pos before drop off the pixel
             if (location == 2 || location == 3) {
-                encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 5.0);
-                slide(direction, 22);
+                if((isBlue()&&isNear())||(isRed()&&isFar())){
+                    slide(direction, 16);
+                }
+                else {
+                    encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 5.0);
+                    slide(direction, 22);
+                }
                 encoderDrive(DRIVE_SPEED, 37, 37, 37, 37, 20.0);
                 if (location == 2) {
                     slide(-direction, 18);
@@ -106,20 +115,22 @@ public abstract class AutoMode extends RobotParent {
                 } else {
                     slide(-direction, 11);
                     dropPixel();
-                    slide(-direction, 7);
+                    if((isBlue()&&isFar())&&(isRed()&&isNear())){
+                        slide(-direction, 7);
+                    }
                     sleep(100);
                 }
                 encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 5.0);
             }
-                if (location == 1){
-                    encoderDrive(DRIVE_SPEED, 15,15,15,15,10.0);
-                    turnRight90();
-                    encoderDrive(DRIVE_SPEED,-5,-5,-5,-5,5.0);
-                    dropPixel();
-                    encoderDrive(DRIVE_SPEED,5,5,5,5,5.0);
-                    slide(-direction,25);
-                }
 
+            if (location == 1){
+                encoderDrive(DRIVE_SPEED, 15,15,15,15,10.0);
+                turnRight90();
+                encoderDrive(DRIVE_SPEED,-5,-5,-5,-5,5.0);
+                dropPixel();
+                encoderDrive(DRIVE_SPEED,5,5,5,5,5.0);
+                slide(-direction,25);
+            }
 
             // different scenerio
 
@@ -144,7 +155,7 @@ public abstract class AutoMode extends RobotParent {
                 }
             }
             else{
-                encoderDrive(DRIVE_SPEED, 20, 20, 20, 20, 10.0); // back up to drop the pixel
+                encoderDrive(DRIVE_SPEED, 13, 13, 13, 13, 10.0); // back up to drop the pixel
                 // Running off into other team backstage and driving into board
                 //slide(-direction,40);
                 //encoderDrive(DRIVE_SPEED, 15, 15, 15, 15, 10.0); // back up to drop the pixel
@@ -255,6 +266,9 @@ public abstract class AutoMode extends RobotParent {
         boolean atDestination = false;
         while(!atDestination && opModeIsActive()){
             AprilTagDetection tagData = getBestTagforLocation();
+            if(tagData == null){
+                break;
+            }
             atDestination = driveTowardTag(tagData);
 
             telemetryAprilTag();
@@ -289,16 +303,22 @@ public abstract class AutoMode extends RobotParent {
                 bestMatch = detection;
             }
         }
+        if(bestMatch == null){
+            debugMsg = "best match null:";
+            telemetryAprilTag();
+            telemetry.update();
+            return null;
+        }
+
         debugMsg = "best match:" + bestMatch.id;
+        telemetryAprilTag();
+        telemetry.update();
         return bestMatch;
     }
 
     private boolean driveTowardTag(AprilTagDetection tagData){
         int tagId = isRed()?tagData.id-3 : tagData.id;
         double tagDistance = (tagId - propLocation)*8-tagData.ftcPose.x;
-        if((isBlue()&&isNear()) || (isRed()&& isFar())){
-            tagDistance =+4;
-        }
 
         if (tagData.ftcPose.yaw>5 || tagData.ftcPose.yaw<-5){
             turn(-1, tagData.ftcPose.yaw*0.2);
@@ -307,7 +327,9 @@ public abstract class AutoMode extends RobotParent {
         }
         if (tagDistance>2 || tagDistance < -2){
             debugMsg += "slide = " + tagDistance + ":";
-            slide(1,(int)(tagDistance));
+            telemetryAprilTag();
+            telemetry.update();
+            slide(-1,(int)(tagDistance));
             return false;
         }
         if(tagData.ftcPose.y<13 && tagData.ftcPose.y>11){
@@ -334,14 +356,27 @@ public abstract class AutoMode extends RobotParent {
 
         if (currentRecognitions.size() == 1) { // if team prop is recognized at straight position
             Recognition found = currentRecognitions.get(0);
-            if(found.getLeft() < 320)
-            {
-                location = 2;
+            if((isBlue() && isFar())||(isRed())&&isNear()) {
+                if(found.getLeft() < 320)
+                {
+                    location = 2;
+                }
+                else{
+                    location = 3;
+                }
+                telemetry.addData("Position method recognized: ", location);
             }
             else{
-                location = 3;
+                if(found.getLeft() > 320)
+                {
+                    location = 2;
+                }
+                else{
+                    location = 3;
+                }
+                telemetry.addData("Position method recognized: ", location);
             }
-            telemetry.addData("Position method recognized: ", location);
+            telemetry.update();
 
 //            slide(direction,10);
         }
@@ -380,16 +415,19 @@ public abstract class AutoMode extends RobotParent {
         }
     }
     protected void backDrop(){
+
         closeRightClaw();
         closeLeftClaw();
+
+        if((isBlue()&&isNear()) || (isRed()&& isFar())){
+            slide(-1,-4);
+        }
 
         moveArmUp();
 //        encoderDrive(DRIVE_SPEED,   1, 1, 1, 1,4.0);
         openRightClaw();
         openLeftClaw();
         sleep(500);
-        closeRightClaw();
-        closeLeftClaw();
         moveArmDown();
     }
     protected void turnLeft90(){
