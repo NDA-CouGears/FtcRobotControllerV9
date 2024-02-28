@@ -76,6 +76,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
  * to use those parameters.
  */
 @TeleOp(name = "Sensor: IMU Orthogonal", group = "Sensor")
+@Disabled
 public class SensorIMUOrthogonal extends LinearOpMode
 {
     // The IMU sensor object
