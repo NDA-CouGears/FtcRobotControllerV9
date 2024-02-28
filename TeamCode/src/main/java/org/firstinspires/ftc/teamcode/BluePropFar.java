@@ -9,7 +9,7 @@ public class BluePropFar extends AutoMode {
     protected TfodProcessor getProcessor(){
         String[] labels = {"Blue Prop"};
         TfodProcessor newProcessor = new TfodProcessor.Builder()
-                .setModelAssetName("bluetrainingfinal.tflite")
+                .setModelAssetName("newBlueModel.tflite")
                 .setModelLabels(labels)
                 .setIsModelQuantized(true)
                 .build();
