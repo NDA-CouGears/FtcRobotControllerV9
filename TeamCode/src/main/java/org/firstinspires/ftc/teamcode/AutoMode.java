@@ -125,11 +125,22 @@ public abstract class AutoMode extends RobotParent {
 
             if (location == 1){
                 encoderDrive(DRIVE_SPEED, 15,15,15,15,10.0);
-                turnRight90();
-                encoderDrive(DRIVE_SPEED,-5,-5,-5,-5,5.0);
+                if(isBlue()&&isNear()||isRed()&&isFar()){
+                    turnLeft90();
+                }
+                else{
+                    turnRight90();
+                }
+                encoderDrive(DRIVE_SPEED,-7,-7,-7,-7,5.0);
                 dropPixel();
-                encoderDrive(DRIVE_SPEED,5,5,5,5,5.0);
+                encoderDrive(DRIVE_SPEED,7,7,7,7,5.0);
                 slide(-direction,25);
+                if(isBlue()&&isNear()||isRed()&&isFar()){
+                    turnRight90();
+                }
+                else{
+                    turnLeft90();
+                }
             }
 
             // different scenerio

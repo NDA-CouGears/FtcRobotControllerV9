@@ -154,9 +154,6 @@ abstract public class RobotParent extends LinearOpMode {
     protected void encoderArmDrive(double speed,
                                 double armPos,
                                 double timeoutS) {
-
-        speed = 0.5;
-
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
             // Determine new target position, and pass to motor controller
