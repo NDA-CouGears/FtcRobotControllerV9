@@ -196,6 +196,28 @@ abstract public class RobotParent extends LinearOpMode {
             armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
+    protected void encoderArmDriveNoWait(double speed,
+                                   double armPos) {
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+            // Determine new target position, and pass to motor controller
+            armMotor.setTargetPosition((int)armPos);
+
+            // Turn On RUN_TO_POSITION
+            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            telemetry.addData("Currently at", " at %7d",
+                    armMotor.getCurrentPosition());
+            telemetry.update();
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            armMotor.setPower(Math.abs(speed));
+
+            telemetry.addData("Moved to", " %7f", armPos);
+            telemetry.update();
+        }
+    }
     protected void mecanumDrive() {
         double y = signPreserveSquare(gamepad1.left_stick_y); // Remember, this is reversed!
         double x = signPreserveSquare(gamepad1.left_stick_x * -0.55); // Counteract imperfect strafing
@@ -325,7 +347,7 @@ abstract public class RobotParent extends LinearOpMode {
     }
     protected void moveArmDown(){
         wristServo.setPosition(wristServoFloor);
-        encoderArmDrive(1.0, armPosFloor, 20);
+        encoderArmDriveNoWait(1.0, 1000);
     }
 
     protected void drone(){

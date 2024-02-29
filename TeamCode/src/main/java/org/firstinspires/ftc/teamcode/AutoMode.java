@@ -124,16 +124,20 @@ public abstract class AutoMode extends RobotParent {
             }
 
             if (location == 1){
-                encoderDrive(DRIVE_SPEED, 15,15,15,15,10.0);
+                encoderDrive(DRIVE_SPEED, 17,17,17,17,10.0);
                 if(isBlue()&&isNear()||isRed()&&isFar()){
                     turnLeft90();
+                    encoderDrive(DRIVE_SPEED,-7,-7,-7,-7,5.0);
+                    dropPixel();
+                    encoderDrive(DRIVE_SPEED,7,7,7,7,5.0);
                 }
                 else{
                     turnRight90();
+                    encoderDrive(DRIVE_SPEED,-5,-5,-5,-5,5.0);
+                    dropPixel();
+                    encoderDrive(DRIVE_SPEED,5,5,5,5,5.0);
                 }
-                encoderDrive(DRIVE_SPEED,-7,-7,-7,-7,5.0);
-                dropPixel();
-                encoderDrive(DRIVE_SPEED,7,7,7,7,5.0);
+
                 slide(-direction,25);
                 if(isBlue()&&isNear()||isRed()&&isFar()){
                     turnRight90();
@@ -154,16 +158,11 @@ public abstract class AutoMode extends RobotParent {
             else {
                 // safety margin to clear bar
                 encoderDrive(DRIVE_SPEED, 2, 2, 2, 2, 10.0); // back up to drop the pixel
-                turnRight90();
+                encoderDrive(DRIVE_SPEED,   17, -17, 17, -17,4.0);
             }
             // if far, drive to the position where close one ends
             if (isFar()){
-                if(location == 1){
-                    encoderDrive(DRIVE_SPEED, -80, -80, -80, -80, 10.0); // back up to drop the pixel
-                }
-                else {
-                    encoderDrive(DRIVE_SPEED, 80, 80, 80, 80, 10.0); // back up to drop the pixel
-                }
+                    encoderDrive(DRIVE_SPEED, 78, 78, 78, 78, 10.0); // back up to drop the pixel
             }
             else{
                 encoderDrive(DRIVE_SPEED, 13, 13, 13, 13, 10.0); // back up to drop the pixel
@@ -176,8 +175,12 @@ public abstract class AutoMode extends RobotParent {
             if ((isBlue() && isNear()) || (isRed()) && isFar()){
                 direction = -direction;
             }
-
-            slide(-direction,35);
+            if(isRed()){
+                slide(direction,31);
+            }
+            else{
+                slide(-direction,35);
+            }
             sleep(200);
             closeRightClaw();
             closeLeftClaw();
@@ -434,12 +437,29 @@ public abstract class AutoMode extends RobotParent {
             slide(-1,-4);
         }
 
+        if(isRed()){
+            slide(1,2);
+        }
+
         moveArmUp();
 //        encoderDrive(DRIVE_SPEED,   1, 1, 1, 1,4.0);
         openRightClaw();
         openLeftClaw();
         sleep(500);
         moveArmDown();
+        sleep(1500);
+        if(isNear()){
+            if(isBlue()){
+                int slideDistance = 16 + propLocation*6;
+                slide(-1,slideDistance);
+                encoderDrive(DRIVE_SPEED,10,10,10,10, 5.0);
+            }
+            else{
+                int slideDistance = 16 + (4-propLocation)*6;
+                slide(1,slideDistance);
+                encoderDrive(DRIVE_SPEED,5,5,5,5, 5.0);
+            }
+        }
     }
     protected void turnLeft90(){
         encoderDrive(DRIVE_SPEED,   -17.5, 17.5, -17.5, 17.5,4.0);
