@@ -92,8 +92,9 @@ public abstract class AutoMode extends RobotParent {
                 direction = -1;
             }
             telemetry.addData("direction: ", direction);
+            encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 5.0);
+
             if((isBlue()&&isNear())||(isRed()&&isFar())){
-                encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 5.0);
                 slide(direction,6);
             }
             int location = locateProp(); // identify where is the team prop
@@ -105,7 +106,6 @@ public abstract class AutoMode extends RobotParent {
                     slide(direction, 16);
                 }
                 else {
-                    encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 5.0);
                     slide(direction, 22);
                 }
                 encoderDrive(DRIVE_SPEED, 37, 37, 37, 37, 20.0);
