@@ -31,7 +31,6 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Size;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -52,10 +51,33 @@ import java.util.List;
 public abstract class AutoMode extends RobotParent {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-    private static final String TFOD_MODEL_FILE ="file:///android_asset/quuen1.tflite" ;
-    private int direction = 1; // set default direction to right for sliding
-    protected int testlocation = 0;
-    protected int propLocation;
+
+    protected static final int DIRECTION_RIGHT = 1;
+    protected static final int DIRECTION_LEFT = -1;
+    private int direction = DIRECTION_RIGHT; // set default direction to right for sliding
+
+    /**
+     * Which path do we need to take to drop of the purple pixel. Outside is toward the outer walls
+     * while inside is toward the center gate/barrier.
+     */
+    protected static final int PATH_INSIDE = 1;
+    protected static final int PATH_CENTER = 2;
+    protected static final int PATH_OUTSIDE = 3;
+
+    /** Used to override the locate prop logic to force a location, used by subclasses for testing */
+    protected int testLocation = 0;
+
+    /**
+     * The April tag IDs for each location on the backdrops
+     */
+    protected static final int BLUE_LEFT_TAG = 1;
+    protected static final int BLUE_CENTER_TAG = 2;
+    protected static final int BLUE_RIGHT_TAG = 3;
+    protected static final int RED_LEFT_TAG = 4;
+    protected static final int RED_CENTER_TAG = 5;
+    protected static final int RED_RIGHT_TAG = 6;
+
+    protected int targetTagID;
 
     protected String debugMsg = "";
 
@@ -89,7 +111,7 @@ public abstract class AutoMode extends RobotParent {
 
             if ((isRed() && isFar()) || (isBlue() && isNear())) //set slide direction to left
             {
-                direction = -1;
+                direction = DIRECTION_LEFT;
             }
             telemetry.addData("direction: ", direction);
             encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 5.0);
@@ -98,10 +120,11 @@ public abstract class AutoMode extends RobotParent {
                 slide(direction,6);
             }
             int location = locateProp(); // identify where is the team prop
-            propLocation = location;
+            targetTagID = getTargetTagIDForLocation(location);
+
             telemetry.addData("Position x: ", location);
             // move to the prep pos before drop off the pixel
-            if (location == 2 || location == 3) {
+            if (location == PATH_CENTER || location == PATH_OUTSIDE) {
                 if((isBlue()&&isNear())||(isRed()&&isFar())){
                     slide(direction, 16);
                 }
@@ -109,7 +132,7 @@ public abstract class AutoMode extends RobotParent {
                     slide(direction, 22);
                 }
                 encoderDrive(DRIVE_SPEED, 37, 37, 37, 37, 20.0);
-                if (location == 2) {
+                if (location == PATH_CENTER) {
                     slide(-direction, 18);
                     dropPixel();
                 } else {
@@ -123,7 +146,7 @@ public abstract class AutoMode extends RobotParent {
                 encoderDrive(DRIVE_SPEED, 3, 3, 3, 3, 5.0);
             }
 
-            if (location == 1){
+            if (location == PATH_INSIDE){
                 encoderDrive(DRIVE_SPEED, 17,17,17,17,10.0);
                 if(isBlue()&&isNear()||isRed()&&isFar()){
                     turnLeft90();
@@ -193,7 +216,54 @@ public abstract class AutoMode extends RobotParent {
 
     }   // end runOpMode()
 
-//    determine red & blue, far & near
+    private int getTargetTagIDForLocation(int location) {
+        if (isBlue()) {
+            if (isNear()) {
+                switch (location) {
+                    case PATH_INSIDE:
+                        return BLUE_RIGHT_TAG;
+                    case PATH_CENTER:
+                        return BLUE_CENTER_TAG;
+                    case PATH_OUTSIDE:
+                        return BLUE_LEFT_TAG;
+                }
+            }
+            else {
+                switch (location) {
+                    case PATH_INSIDE:
+                        return BLUE_LEFT_TAG;
+                    case PATH_CENTER:
+                        return BLUE_CENTER_TAG;
+                    case PATH_OUTSIDE:
+                        return BLUE_RIGHT_TAG;
+                }
+            }
+        }
+        else {
+            if (isNear()) {
+                switch (location) {
+                    case PATH_INSIDE:
+                        return RED_LEFT_TAG;
+                    case PATH_CENTER:
+                        return RED_CENTER_TAG;
+                    case PATH_OUTSIDE:
+                        return RED_RIGHT_TAG;
+                }
+            }
+            else {
+                switch (location) {
+                    case PATH_INSIDE:
+                        return RED_RIGHT_TAG;
+                    case PATH_CENTER:
+                        return RED_CENTER_TAG;
+                    case PATH_OUTSIDE:
+                        return RED_LEFT_TAG;
+                }
+            }
+        }
+    }
+
+    //    determine red & blue, far & near
     abstract protected TfodProcessor getProcessor();
     private boolean isRed(){return !isBlue();}
     private boolean isFar(){return !isNear();}
@@ -279,7 +349,7 @@ public abstract class AutoMode extends RobotParent {
     private void moveToTag(){
         boolean atDestination = false;
         while(!atDestination && opModeIsActive()){
-            AprilTagDetection tagData = getBestTagforLocation();
+            AprilTagDetection tagData = getBestTagForLocation();
             if(tagData == null){
                 break;
             }
@@ -292,7 +362,7 @@ public abstract class AutoMode extends RobotParent {
     }
 
 
-    private AprilTagDetection getBestTagforLocation() {
+    private AprilTagDetection getBestTagForLocation() {
         List<AprilTagDetection> currentDetections = null;
         for (int x = 0; x<10; x++){
             debugMsg = "Tries:" + x;
@@ -312,7 +382,7 @@ public abstract class AutoMode extends RobotParent {
                 bestMatch = detection;
                 continue;
             }
-            if (Math.abs(bestMatch.id - propLocation) > (Math.abs(detection.id - propLocation)))
+            if (Math.abs(bestMatch.id - targetTagID) > (Math.abs(detection.id - targetTagID)))
             {
                 bestMatch = detection;
             }
@@ -331,8 +401,8 @@ public abstract class AutoMode extends RobotParent {
     }
 
     private boolean driveTowardTag(AprilTagDetection tagData){
-        int tagId = isRed()?tagData.id-3 : tagData.id;
-        double tagDistance = (tagId - propLocation)*8-tagData.ftcPose.x;
+        int tagId = tagData.id;
+        double tagDistance = (tagId - targetTagID)*8-tagData.ftcPose.x;
 
         if (tagData.ftcPose.yaw>5 || tagData.ftcPose.yaw<-5){
             turn(-1, tagData.ftcPose.yaw*0.2);
@@ -355,8 +425,8 @@ public abstract class AutoMode extends RobotParent {
     }
     private int locateProp() {
         int location = 0;
-        if (testlocation > 0){
-            return testlocation;
+        if (testLocation > 0){
+            return testLocation;
         }
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         int trys = 1;
@@ -373,20 +443,20 @@ public abstract class AutoMode extends RobotParent {
             if((isBlue() && isFar())||(isRed())&&isNear()) {
                 if(found.getLeft() < 320)
                 {
-                    location = 2;
+                    location = PATH_CENTER;
                 }
                 else{
-                    location = 3;
+                    location = PATH_OUTSIDE;
                 }
                 telemetry.addData("Position method recognized: ", location);
             }
             else{
                 if(found.getLeft() > 320)
                 {
-                    location = 2;
+                    location = PATH_CENTER;
                 }
                 else{
-                    location = 3;
+                    location = PATH_OUTSIDE;
                 }
                 telemetry.addData("Position method recognized: ", location);
             }
@@ -395,27 +465,26 @@ public abstract class AutoMode extends RobotParent {
 //            slide(direction,10);
         }
         else {
-           location = 1;
+           location = PATH_INSIDE;
         }
         return location;
     }
 
     private void slide (int direction, int inches){
-        if (direction == 1){ // slide to right
+        if (direction == DIRECTION_RIGHT){ // slide to right
             encoderDrive(0.4, inches , -inches, -inches, inches, 10.0);
         }
-        if (direction == -1){ // slide to left
+        if (direction == DIRECTION_LEFT){ // slide to left
             encoderDrive(0.4, -inches , inches, inches, -inches, 10.0);
         }
     }
 
 
     private void turn (int direction, double degrees){
-        if (direction == 1) { // turn right in a cerntain degrees
+        if (direction == DIRECTION_RIGHT) { // turn right in a cerntain degrees
             encoderDrive(DRIVE_SPEED, degrees, -degrees, degrees, -degrees, 10.0);
         }
-
-        if (direction == -1) { // turn right in a cerntain degrees
+        if (direction == DIRECTION_LEFT) { // turn right in a cerntain degrees
             encoderDrive(DRIVE_SPEED, -degrees, degrees, -degrees, degrees, 10.0);
         }
     }
@@ -450,12 +519,12 @@ public abstract class AutoMode extends RobotParent {
         sleep(1500);
         if(isNear()){
             if(isBlue()){
-                int slideDistance = 16 + propLocation*6;
+                int slideDistance = 16 + targetTagID*6;
                 slide(-1,slideDistance);
                 encoderDrive(DRIVE_SPEED,10,10,10,10, 5.0);
             }
             else{
-                int slideDistance = 16 + (4-propLocation)*6;
+                int slideDistance = 16 + (7-targetTagID)*6;
                 slide(1,slideDistance);
                 encoderDrive(DRIVE_SPEED,5,5,5,5, 5.0);
             }
