@@ -8,7 +8,7 @@ public class BluePropNear extends AutoMode {
     protected TfodProcessor getProcessor(){
         String[] labels = {"Blue Prop"};
         TfodProcessor newProcessor = new TfodProcessor.Builder()
-                .setModelAssetName("newBlueModel.tflite")
+                .setModelAssetName("newerBlueModel.tflite")
                 .setModelLabels(labels)
                 .setIsModelQuantized(true)
                 .build();

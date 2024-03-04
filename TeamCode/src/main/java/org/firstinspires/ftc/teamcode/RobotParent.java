@@ -220,7 +220,7 @@ abstract public class RobotParent extends LinearOpMode {
     }
     protected void mecanumDrive() {
         double y = signPreserveSquare(gamepad1.left_stick_y); // Remember, this is reversed!
-        double x = signPreserveSquare(gamepad1.left_stick_x * -0.55); // Counteract imperfect strafing
+        double x = signPreserveSquare(gamepad1.left_stick_x * -0.7); // Counteract imperfect strafing
         double rx = (signPreserveSquare(gamepad1.right_stick_x * -1))*0.5;
 
         // Denominator is the largest motor power (absolute value) or 1
