@@ -200,12 +200,12 @@ public abstract class AutoMode extends RobotParent {
 
             if(justPark()){
                 if(isRed()){
-                    slide(direction,2);
+                    slide(direction,5);
                 }
                 else{
-                    slide(-direction,2);
+                    slide(-direction,5);
                 }
-                encoderDrive(DRIVE_SPEED, 10,10,10,10, 5.0);
+                encoderDrive(DRIVE_SPEED, 20,20,20,20, 5.0);
                 openLeftClaw();
                 openRightClaw();
                 sleep(200);
@@ -216,7 +216,7 @@ public abstract class AutoMode extends RobotParent {
             // turn to face the board
 
             if(isRed()){
-                slide(direction,27);
+                slide(direction,26);
             }
             else{
                 slide(-direction,30);
