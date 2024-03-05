@@ -36,7 +36,7 @@ abstract public class RobotParent extends LinearOpMode {
     private Servo clawRightServo;
     private Servo wristServo;
     private Servo droneServo;
-    private Servo ledServo;
+    private Servo ledLight;
     private TouchSensor touchSensor;
 
 
@@ -253,6 +253,7 @@ abstract public class RobotParent extends LinearOpMode {
         wristServo = hardwareMap.servo.get("servo3"); // port 2 ex hub
         droneServo = hardwareMap.servo.get("servo4"); //port 3 on ex hub
         touchSensor = hardwareMap.get(TouchSensor.class, "arm_zero");
+        ledLight = hardwareMap.servo.get("ledlight");
 
         winchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
