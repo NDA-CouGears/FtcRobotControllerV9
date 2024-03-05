@@ -36,6 +36,7 @@ abstract public class RobotParent extends LinearOpMode {
     private Servo clawRightServo;
     private Servo wristServo;
     private Servo droneServo;
+    private Servo ledServo;
     private TouchSensor touchSensor;
 
 
@@ -303,6 +304,7 @@ abstract public class RobotParent extends LinearOpMode {
         double winchPower = signPreserveSquare(gamepad2.right_stick_y);
         winchPower = Range.clip(winchPower, -1.0, 1.0);
         winchMotor.setPower(winchPower);
+        /*
         if (gamepad2.b){
             winchLock = !winchLock;
             winchLockPos = winchMotor.getCurrentPosition();
@@ -318,6 +320,7 @@ abstract public class RobotParent extends LinearOpMode {
                 winchErrorCorrector = false;
             }
         }
+        */
     }
 
     protected void launchDrone(){
@@ -391,6 +394,10 @@ abstract public class RobotParent extends LinearOpMode {
             if (gamepad2.dpad_up) {
                 wristServo.setPosition(wristServo.getPosition()-.01);
             }
+        }
+
+        if (gamepad2.b) {
+            wristServo.setPosition(wristServoFloor);
         }
 
 //        if(gamepad2.y){
