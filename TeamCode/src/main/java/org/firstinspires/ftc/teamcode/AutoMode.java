@@ -176,7 +176,7 @@ public abstract class AutoMode extends RobotParent {
 
             // turn 90 degres angles before moving through the bar
             if (isBlue()){
-                turnLeft90();
+                encoderDrive(DRIVE_SPEED,   -17.25, 17.25, -17.25, 17.25,4.0);
             }
             else {
                 // safety margin to clear bar
@@ -194,21 +194,37 @@ public abstract class AutoMode extends RobotParent {
                 //encoderDrive(DRIVE_SPEED, 15, 15, 15, 15, 10.0); // back up to drop the pixel
             }
 
-            // turn to face the board
             if ((isBlue() && isNear()) || (isRed()) && isFar()){
                 direction = -direction;
             }
+
+            if(justPark()){
+                if(isRed()){
+                    slide(direction,2);
+                }
+                else{
+                    slide(-direction,2);
+                }
+                encoderDrive(DRIVE_SPEED, 10,10,10,10, 5.0);
+                openLeftClaw();
+                openRightClaw();
+                sleep(200);
+                closeRightClaw();
+                closeLeftClaw();
+                return;
+            }
+            // turn to face the board
+
             if(isRed()){
-                slide(direction,31);
+                slide(direction,27);
             }
             else{
-                slide(-direction,35);
+                slide(-direction,30);
             }
             sleep(200);
             closeRightClaw();
             closeLeftClaw();
             moveToTag();
-            sleep(20);
         }
 
         // Save more CPU resources when camera is no longer needed.
@@ -261,12 +277,16 @@ public abstract class AutoMode extends RobotParent {
                 }
             }
         }
+
+        return 0;
     }
 
     //    determine red & blue, far & near
     abstract protected TfodProcessor getProcessor();
     private boolean isRed(){return !isBlue();}
     private boolean isFar(){return !isNear();}
+
+    protected boolean justPark() { return false; }
     abstract protected boolean isBlue();
     abstract protected boolean isNear();
 

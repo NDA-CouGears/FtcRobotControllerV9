@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
-@Autonomous(name = "Red Team Prop Far 1", group = "Team OpModes")
-public class RedPropFar extends AutoMode {
+@Autonomous(name = "Red Team Prop Far Park", group = "Team OpModes")
+public class RedPropFarPark extends AutoMode {
     protected TfodProcessor getProcessor(){
         String[] labels = {"Blue Prop"};
         TfodProcessor newProcessor = new TfodProcessor.Builder()
@@ -25,6 +25,9 @@ public class RedPropFar extends AutoMode {
     protected boolean isNear() {
         return false;
     }
+
+    @Override
+    protected boolean justPark() { return true; }
 
 }
 

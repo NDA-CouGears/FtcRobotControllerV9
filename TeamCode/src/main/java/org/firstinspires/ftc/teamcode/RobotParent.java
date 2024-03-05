@@ -219,7 +219,7 @@ abstract public class RobotParent extends LinearOpMode {
         }
     }
     protected void mecanumDrive() {
-        double y = signPreserveSquare(gamepad1.left_stick_y); // Remember, this is reversed!
+        double y = signPreserveSquare(gamepad1.left_stick_y*0.9); // Remember, this is reversed!
         double x = signPreserveSquare(gamepad1.left_stick_x * -0.7); // Counteract imperfect strafing
         double rx = (signPreserveSquare(gamepad1.right_stick_x * -1))*0.5;
 
