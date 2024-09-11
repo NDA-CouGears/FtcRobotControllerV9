@@ -450,10 +450,16 @@ public abstract class AutoMode extends RobotParent {
         }
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         int trys = 1;
-        while (currentRecognitions.size() == 0 && trys < 15) {
+        int totalTrys = 15;
+        int timeSleep = 100;
+        if(isRed()&&isNear()){
+            totalTrys = 10;
+            timeSleep = 250;
+        }
+        while (currentRecognitions.size() == 0 && trys < totalTrys) {
             telemetry.addData("First recognization failed, try times", trys);
             telemetry.update();
-            sleep(100);
+            sleep(timeSleep);
             currentRecognitions = tfod.getRecognitions();
             trys++;
         }
@@ -464,9 +470,16 @@ public abstract class AutoMode extends RobotParent {
                 if(found.getLeft() < 320)
                 {
                     location = PATH_CENTER;
+                    debugMsg = "Prop left:" + found.getLeft() + " --- Path center";
+                    telemetryAprilTag();
+                    telemetry.update();
                 }
                 else{
                     location = PATH_OUTSIDE;
+                    debugMsg = "Prop left:" + found.getLeft() + " --- Path outside";
+                    telemetryAprilTag();
+                    telemetry.update();
+
                 }
                 telemetry.addData("Position method recognized: ", location);
             }
@@ -474,9 +487,15 @@ public abstract class AutoMode extends RobotParent {
                 if(found.getLeft() > 320)
                 {
                     location = PATH_CENTER;
+                    debugMsg = "Prop left:" + found.getLeft() + " --- Path center";
+                    telemetryAprilTag();
+                    telemetry.update();
                 }
                 else{
                     location = PATH_OUTSIDE;
+                    debugMsg = "Prop left:" + found.getLeft() + " --- Path outside";
+                    telemetryAprilTag();
+                    telemetry.update();
                 }
                 telemetry.addData("Position method recognized: ", location);
             }
@@ -534,9 +553,9 @@ public abstract class AutoMode extends RobotParent {
 //        encoderDrive(DRIVE_SPEED,   1, 1, 1, 1,4.0);
         openRightClaw();
         openLeftClaw();
-        sleep(500);
+        sleep(250);
         moveArmDown();
-        sleep(1500);
+        sleep(750);
         if(isNear()){
             if(isBlue()){
                 int slideDistance = 16 + targetTagID*6;
